@@ -12,6 +12,8 @@ import com.hr.health.common.constant.CacheConstants;
 import com.hr.health.common.constant.Constants;
 import com.hr.health.common.utils.sign.Base64;
 import com.hr.health.system.service.ISysConfigService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,7 @@ import com.hr.health.common.utils.uuid.IdUtils;
  * @author swq
  */
 @RestController
+@Api(tags = "验证码模块")
 public class CaptchaController {
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
@@ -43,6 +46,7 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
+    @ApiOperation("生成验证码")
     @GetMapping("/captchaImage")
     public AjaxResult getCode(HttpServletResponse response) throws IOException {
         AjaxResult ajax = AjaxResult.success();

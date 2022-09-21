@@ -11,6 +11,8 @@ import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.framework.web.service.SysLoginService;
 import com.hr.health.framework.web.service.SysPermissionService;
 import com.hr.health.system.service.ISysMenuService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,7 @@ import com.hr.health.common.core.domain.AjaxResult;
  *
  * @author swq
  */
+@Api(tags = "登录")
 @RestController
 public class SysLoginController {
     @Autowired
@@ -41,6 +44,7 @@ public class SysLoginController {
      * @return 结果
      */
     @PostMapping("/login")
+    @ApiOperation("登录")
     public AjaxResult login(@RequestBody LoginBody loginBody) {
         AjaxResult ajax = AjaxResult.success();
         // 生成令牌

@@ -30,7 +30,7 @@ import io.swagger.annotations.ApiOperation;
  *
  * @author swq
  */
-@Api("用户信息管理")
+@Api(tags = "用户信息管理")
 @RestController
 @RequestMapping("/test/user")
 public class TestController extends BaseController {

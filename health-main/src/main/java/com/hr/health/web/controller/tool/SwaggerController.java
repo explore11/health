@@ -15,8 +15,8 @@ import com.hr.health.common.core.controller.BaseController;
 @RequestMapping("/tool/swagger")
 public class SwaggerController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tool:swagger:view')")
-    @GetMapping()
+    @GetMapping("/index")
     public String index() {
-        return redirect("/swagger-ui.html");
+        return redirect("/doc.html");
     }
 }
