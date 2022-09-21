@@ -14,7 +14,7 @@
     <description>健康监管系统</description>
 
     <modules>
-        <module>health-admin</module>
+        <module>health-main</module>
         <module>health-framework</module>
         <module>health-system</module>
         <module>health-quartz</module>

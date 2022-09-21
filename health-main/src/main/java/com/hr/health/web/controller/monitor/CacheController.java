@@ -30,10 +30,9 @@ import com.hr.health.common.core.domain.AjaxResult;
 @RestController
 @RequestMapping("/monitor/cache")
 public class CacheController {
+    private final static List<SysCache> caches = new ArrayList<SysCache>();
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
-
-    private final static List<SysCache> caches = new ArrayList<SysCache>();
 
     {
         caches.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
