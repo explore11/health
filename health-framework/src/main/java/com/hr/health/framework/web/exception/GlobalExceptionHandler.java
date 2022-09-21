@@ -2,6 +2,9 @@ package com.hr.health.framework.web.exception;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.hr.health.common.core.domain.Result;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -55,6 +58,19 @@ public class GlobalExceptionHandler {
         Integer code = e.getCode();
         return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
     }
+
+    /**
+     * 处理业务的自定义异常
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(value = MicroServiceException.class)
+    public Result handleMicroServiceApiException(MicroServiceException ex) {
+        Result<Object> failureResult = Result.failure(ResultCode.getItemByCode(ex.getCode()));
+        failureResult.setMessage(ex.getMessage());
+        return failureResult;
+    }
+
 
     /**
      * 拦截未知的运行时异常

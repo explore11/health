@@ -5,6 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hr.health.common.core.domain.Result;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.utils.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.hr.health.common.core.controller.BaseController;
-import com.hr.health.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -41,19 +43,19 @@ public class TestController extends BaseController {
 
     @ApiOperation("获取用户列表")
     @GetMapping("/list")
-    public R<List<UserEntity>> userList() {
+    public Result<List<UserEntity>> userList() {
         List<UserEntity> userList = new ArrayList<UserEntity>(users.values());
-        return R.ok(userList);
+        return Result.success(userList);
     }
 
     @ApiOperation("获取用户详细")
     @ApiImplicitParam(name = "userId", value = "用户ID", required = true, dataType = "int", paramType = "path", dataTypeClass = Integer.class)
     @GetMapping("/{userId}")
-    public R<UserEntity> getUser(@PathVariable Integer userId) {
+    public Result<UserEntity> getUser(@PathVariable Integer userId) {
         if (!users.isEmpty() && users.containsKey(userId)) {
-            return R.ok(users.get(userId));
+            return Result.success(users.get(userId));
         } else {
-            return R.fail("用户不存在");
+            throw new MicroServiceException(ResultCode.USER_NOT_EXIST.code(), ResultCode.USER_NOT_EXIST.message());
         }
     }
 
@@ -65,37 +67,37 @@ public class TestController extends BaseController {
             @ApiImplicitParam(name = "mobile", value = "用户手机", dataType = "String", dataTypeClass = String.class)
     })
     @PostMapping("/save")
-    public R<String> save(UserEntity user) {
-        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUserId())) {
-            return R.fail("用户ID不能为空");
+    public Result<String> save(UserEntity user) {
+        if (StringUtils.isNull(user)) {
+            throw new MicroServiceException(ResultCode.USER_INFO_NOT_EMPTY.code(), ResultCode.USER_INFO_NOT_EMPTY.message());
         }
         users.put(user.getUserId(), user);
-        return R.ok();
+        return Result.success();
     }
 
     @ApiOperation("更新用户")
     @PutMapping("/update")
-    public R<String> update(@RequestBody UserEntity user) {
+    public Result<String> update(@RequestBody UserEntity user) {
         if (StringUtils.isNull(user) || StringUtils.isNull(user.getUserId())) {
-            return R.fail("用户ID不能为空");
+            throw new MicroServiceException(ResultCode.USER_ID_NOT_EMPTY.code(), ResultCode.USER_ID_NOT_EMPTY.message());
         }
         if (users.isEmpty() || !users.containsKey(user.getUserId())) {
-            return R.fail("用户不存在");
+            throw new MicroServiceException(ResultCode.USER_NOT_EXIST.code(), ResultCode.USER_NOT_EXIST.message());
         }
         users.remove(user.getUserId());
         users.put(user.getUserId(), user);
-        return R.ok();
+        return Result.success();
     }
 
     @ApiOperation("删除用户信息")
     @ApiImplicitParam(name = "userId", value = "用户ID", required = true, dataType = "int", paramType = "path", dataTypeClass = Integer.class)
     @DeleteMapping("/{userId}")
-    public R<String> delete(@PathVariable Integer userId) {
+    public Result<String> delete(@PathVariable Integer userId) {
         if (!users.isEmpty() && users.containsKey(userId)) {
             users.remove(userId);
-            return R.ok();
+            return Result.success();
         } else {
-            return R.fail("用户不存在");
+            throw new MicroServiceException(ResultCode.USER_NOT_EXIST.code(), ResultCode.USER_NOT_EXIST.message());
         }
     }
 }
