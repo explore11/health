@@ -7,6 +7,8 @@ import com.hr.health.common.annotation.Log;
 import com.hr.health.common.enums.BusinessType;
 import com.hr.health.system.domain.SysConfig;
 import com.hr.health.system.service.ISysConfigService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +32,7 @@ import com.hr.health.common.utils.poi.ExcelUtil;
  * @author swq
  */
 @RestController
+@Api(value = "参数配置")
 @RequestMapping("/system/config")
 public class SysConfigController extends BaseController {
     @Autowired
@@ -40,6 +43,7 @@ public class SysConfigController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
+    @ApiOperation("获取参数配置列表")
     public TableDataInfo list(SysConfig config) {
         startPage();
         List<SysConfig> list = configService.selectConfigList(config);

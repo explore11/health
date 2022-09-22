@@ -25,6 +25,9 @@
 
     <properties>
         <health.version>1.0</health.version>
+        <lombok.version>1.18.18</lombok.version>
+        <mybatis-plus.version>3.2.0</mybatis-plus.version>
+        <p6spy.version>3.9.1</p6spy.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -48,6 +51,23 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <!--SQL分析打印-->
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
+            </dependency>
+            <!-- mybatis plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
 
             <!-- SpringBoot的依赖配置-->
             <dependency>
@@ -73,11 +93,11 @@
             </dependency>
 
             <!-- SpringBoot集成mybatis框架 -->
-            <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis-spring-boot.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.mybatis.spring.boot</groupId>-->
+<!--                <artifactId>mybatis-spring-boot-starter</artifactId>-->
+<!--                <version>${mybatis-spring-boot.version}</version>-->
+<!--            </dependency>-->
 
             <!-- pagehelper 分页插件 -->
             <dependency>
@@ -93,7 +113,7 @@
                 <version>${oshi.version}</version>
             </dependency>
 
-            <!-- Swagger3依赖 -->
+            <!-- Swagger2.9.2依赖 -->
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-boot-starter</artifactId>
@@ -194,6 +214,13 @@
             <dependency>
                 <groupId>com.health</groupId>
                 <artifactId>health-common</artifactId>
+                <version>${health.version}</version>
+            </dependency>
+
+            <!-- 通用工具-->
+            <dependency>
+                <groupId>com.health</groupId>
+                <artifactId>health-business</artifactId>
                 <version>${health.version}</version>
             </dependency>
 

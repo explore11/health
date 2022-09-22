@@ -79,6 +79,11 @@
             <artifactId>health-generator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.health</groupId>
+            <artifactId>health-business</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
