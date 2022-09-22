@@ -24,6 +24,7 @@
     </modules>
 
     <properties>
+        <spring-boot-dependencies.version>2.1.6.RELEASE</spring-boot-dependencies.version>
         <health.version>1.0</health.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -31,7 +32,8 @@
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <druid.version>1.2.11</druid.version>
         <bitwalker.version>1.21</bitwalker.version>
-        <swagger.version>3.0.0</swagger.version>
+        <swagger.version>2.9.2</swagger.version>
+        <swagger-ui.version>1.9.6</swagger-ui.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <mybatis-spring-boot.version>2.2.2</mybatis-spring-boot.version>
         <pagehelper.boot.version>1.4.3</pagehelper.boot.version>
@@ -53,7 +55,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.5.14</version>
+                <version>${spring-boot-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -93,18 +95,38 @@
                 <version>${oshi.version}</version>
             </dependency>
 
-            <!-- Swagger3依赖 -->
+<!--            &lt;!&ndash; Swagger3依赖 &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>io.springfox</groupId>-->
+<!--                <artifactId>springfox-boot-starter</artifactId>-->
+<!--                <version>${swagger.version}</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>io.swagger</groupId>-->
+<!--                        <artifactId>swagger-models</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
+
+            <!--swagger-->
             <dependency>
                 <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
+                <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>io.swagger</groupId>
                         <artifactId>swagger-models</artifactId>
+                        <groupId>io.swagger</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!--swagger UI-->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>swagger-bootstrap-ui</artifactId>
+                <version>${swagger-ui.version}</version>
+            </dependency>
+
 
             <!-- io常用工具类 -->
             <dependency>
