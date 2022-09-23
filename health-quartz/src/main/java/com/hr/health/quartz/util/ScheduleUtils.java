@@ -53,6 +53,7 @@ public class ScheduleUtils {
      * 创建定时任务
      */
     public static void createScheduleJob(Scheduler scheduler, SysJob job) throws SchedulerException, TaskException {
+        // 根据任务获取任务的执行器
         Class<? extends Job> jobClass = getQuartzJobClass(job);
         // 构建job信息
         Long jobId = job.getJobId();
@@ -61,6 +62,7 @@ public class ScheduleUtils {
 
         // 表达式调度构建器
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(job.getCronExpression());
+        //设置定时任务策略
         cronScheduleBuilder = handleCronScheduleMisfirePolicy(job, cronScheduleBuilder);
 
         // 按新的cronExpression表达式构建一个新的trigger

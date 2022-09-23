@@ -32,14 +32,12 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-models</artifactId>
-            <version>1.6.2</version>
         </dependency>
 
         <!--swagger-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
             <exclusions>
                 <exclusion>
                     <artifactId>swagger-models</artifactId>
@@ -51,7 +49,6 @@
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>swagger-bootstrap-ui</artifactId>
-            <version>1.9.6</version>
         </dependency>
 
 
@@ -71,12 +68,6 @@
         <dependency>
             <groupId>com.health</groupId>
             <artifactId>health-quartz</artifactId>
-        </dependency>
-
-        <!-- 代码生成-->
-        <dependency>
-            <groupId>com.health</groupId>
-            <artifactId>health-generator</artifactId>
         </dependency>
 
         <dependency>

@@ -32,8 +32,10 @@ import com.hr.health.framework.datasource.DynamicDataSource;
  */
 @Configuration
 public class DruidConfig {
+
+
     @Bean
-    @ConfigurationProperties("spring.datasource.druid.master")
+    @ConfigurationProperties("spring.datasource.druid.master") //将yml中的master映射为一个对象
     public DataSource masterDataSource(DruidProperties druidProperties) {
         DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
         return druidProperties.dataSource(dataSource);
