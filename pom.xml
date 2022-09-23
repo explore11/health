@@ -117,9 +117,16 @@
             <!-- Swagger2.9.2依赖 -->
             <dependency>
                 <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
+                <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>swagger-models</artifactId>
+                        <groupId>io.swagger</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-models</artifactId>
