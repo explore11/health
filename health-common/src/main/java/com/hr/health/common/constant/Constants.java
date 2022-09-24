@@ -84,6 +84,11 @@ public class Constants {
     public static final String LOGIN_USER_KEY = "login_user_key";
 
     /**
+     * 令牌过期时间
+     */
+    public static final String REFRESH_TOKEN_TIME = "refresh_token_time";
+
+    /**
      * 用户ID
      */
     public static final String JWT_USERID = "userid";

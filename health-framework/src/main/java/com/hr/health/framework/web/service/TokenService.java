@@ -1,10 +1,13 @@
 package com.hr.health.framework.web.service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson2.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,6 +44,10 @@ public class TokenService {
     @Value("${token.expireTime}")
     private int expireTime;
 
+    // 令牌刷新有效期（默认60分钟）
+    @Value("${token.refreshTime}")
+    private int refreshTime;
+
     protected static final long MILLIS_SECOND = 1000;
 
     protected static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
@@ -55,18 +62,19 @@ public class TokenService {
      *
      * @return 用户信息
      */
-    public LoginUser getLoginUser(HttpServletRequest request) {
+    public Claims getClaims(HttpServletRequest request) {
         // 获取请求携带的令牌
         String token = getToken(request);
         if (StringUtils.isNotEmpty(token)) {
             try {
                 Claims claims = parseToken(token);
                 // 解析对应的权限以及用户信息
-                String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
-                String userKey = getTokenKey(uuid);
-                LoginUser user = redisCache.getCacheObject(userKey);
-                return user;
+//                String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
+//                String userKey = getTokenKey(uuid);
+//                LoginUser user = redisCache.getCacheObject(userKey);
+                return claims;
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return null;
@@ -100,11 +108,19 @@ public class TokenService {
     public String createToken(LoginUser loginUser) {
         String token = IdUtils.fastUUID();
         loginUser.setToken(token);
+        //设置用户代理信息
         setUserAgent(loginUser);
-        refreshToken(loginUser);
+        // Redis版本的token刷新
+//        refreshToken(loginUser);
+        // 设置登录时间
+        loginUser.setLoginTime(System.currentTimeMillis());
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put(Constants.LOGIN_USER_KEY, token);
+        // 设置用户信息
+        claims.put(Constants.LOGIN_USER_KEY, JSON.toJSONString(loginUser));
+        //设置刷新时间
+        claims.put(Constants.REFRESH_TOKEN_TIME, System.currentTimeMillis() + refreshTime * MILLIS_MINUTE);
+
         return createToken(claims);
     }
 
@@ -120,6 +136,8 @@ public class TokenService {
         if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
             refreshToken(loginUser);
         }
+
+
     }
 
     /**
@@ -158,6 +176,8 @@ public class TokenService {
     private String createToken(Map<String, Object> claims) {
         String token = Jwts.builder()
                 .setClaims(claims)
+                //设置过期时间
+                .setExpiration(new Date(System.currentTimeMillis() + expireTime * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
         return token;
     }
