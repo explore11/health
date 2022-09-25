@@ -53,17 +53,28 @@ public class SysPermissionService {
         if (user.isAdmin()) {
             perms.add("*:*:*");
         } else {
-            List<SysRole> roles = user.getRoles();
-            if (!roles.isEmpty() && roles.size() > 1) {
-                // 多角色设置permissions属性，以便数据权限匹配权限
-                for (SysRole role : roles) {
-                    Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
-                    role.setPermissions(rolePerms);
-                    perms.addAll(rolePerms);
-                }
-            } else {
-                perms.addAll(menuService.selectMenuPermsByUserId(user.getUserId()));
+            perms = getPermissionsByRole(user);
+        }
+        return perms;
+    }
+
+    /**
+     * 根据角色获取权限
+     * @param user
+     * @return
+     */
+    public Set<String> getPermissionsByRole(SysUser user) {
+        Set<String> perms = new HashSet<>();
+        List<SysRole> roles = user.getRoles();
+        if (!roles.isEmpty() && roles.size() > 1) {
+            // 多角色设置permissions属性，以便数据权限匹配权限
+            for (SysRole role : roles) {
+                Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
+                role.setPermissions(rolePerms);
+                perms.addAll(rolePerms);
             }
+        } else {
+            perms.addAll(menuService.selectMenuPermsByUserId(user.getUserId()));
         }
         return perms;
     }

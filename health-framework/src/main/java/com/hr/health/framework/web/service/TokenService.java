@@ -4,10 +4,17 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import com.alibaba.fastjson2.JSON;
+import com.hr.health.common.core.domain.entity.SysUser;
+import com.hr.health.framework.web.domain.server.Sys;
+import com.hr.health.system.service.ISysUserOnlineService;
+import com.hr.health.system.service.ISysUserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -57,6 +64,12 @@ public class TokenService {
     @Autowired
     private RedisCache redisCache;
 
+    @Resource
+    private ISysUserService iSysUserService;
+
+    @Resource
+    private SysPermissionService sysPermissionService;
+
     /**
      * 获取用户身份信息
      *
@@ -65,29 +78,33 @@ public class TokenService {
     public Claims getClaims(HttpServletRequest request) {
         // 获取请求携带的令牌
         String token = getToken(request);
+        System.out.println("token"+token);
         if (StringUtils.isNotEmpty(token)) {
             try {
+
+
                 Claims claims = parseToken(token);
                 // 解析对应的权限以及用户信息
 //                String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
 //                String userKey = getTokenKey(uuid);
 //                LoginUser user = redisCache.getCacheObject(userKey);
                 return claims;
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (ExpiredJwtException e) {
+                //
+                return e.getClaims();
             }
         }
         return null;
     }
 
-    /**
-     * 设置用户身份信息
-     */
-    public void setLoginUser(LoginUser loginUser) {
-        if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
-            refreshToken(loginUser);
-        }
-    }
+//    /**
+//     * 设置用户身份信息
+//     */
+//    public void setLoginUser(LoginUser loginUser) {
+//        if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
+//            refreshToken(loginUser);
+//        }
+//    }
 
     /**
      * 删除用户身份信息
@@ -102,56 +119,54 @@ public class TokenService {
     /**
      * 创建令牌
      *
-     * @param loginUser 用户信息
+     * @param loginUser 用户
      * @return 令牌
      */
     public String createToken(LoginUser loginUser) {
-        String token = IdUtils.fastUUID();
-        loginUser.setToken(token);
-        //设置用户代理信息
-        setUserAgent(loginUser);
-        // Redis版本的token刷新
-//        refreshToken(loginUser);
-        // 设置登录时间
-        loginUser.setLoginTime(System.currentTimeMillis());
 
         Map<String, Object> claims = new HashMap<>();
         // 设置用户信息
         claims.put(Constants.LOGIN_USER_KEY, JSON.toJSONString(loginUser));
         //设置刷新时间
-        claims.put(Constants.REFRESH_TOKEN_TIME, System.currentTimeMillis() + refreshTime * MILLIS_MINUTE);
+        long refresh = System.currentTimeMillis() + refreshTime * MILLIS_MINUTE;
+        claims.put(Constants.REFRESH_TOKEN_TIME, refresh);
+
+//        //根据用户名查询用户信息
+//        SysUser sysUser = iSysUserService.selectUserByUserName(username);
+//        //根据用户查询权限信息
+//        Set<String> permissions = sysPermissionService.getPermissionsByRole(sysUser);
+//        //设置权限信息
+//        claims.put(Constants.PERMISSION, JSON.toJSONString(permissions));
 
         return createToken(claims);
     }
 
-    /**
-     * 验证令牌有效期，相差不足20分钟，自动刷新缓存
-     *
-     * @param loginUser
-     * @return 令牌
-     */
-    public void verifyToken(LoginUser loginUser) {
-        long expireTime = loginUser.getExpireTime();
-        long currentTime = System.currentTimeMillis();
-        if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
-            refreshToken(loginUser);
-        }
+//    /**
+//     * 验证令牌有效期，相差不足20分钟，自动刷新缓存
+//     *
+//     * @param loginUser
+//     * @return 令牌
+//     */
+//    public void verifyToken(LoginUser loginUser) {
+//        long expireTime = loginUser.getExpireTime();
+//        long currentTime = System.currentTimeMillis();
+//        if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
+//            refreshToken(loginUser);
+//        }
+//    }
 
-
-    }
-
-    /**
-     * 刷新令牌有效期
-     *
-     * @param loginUser 登录信息
-     */
-    public void refreshToken(LoginUser loginUser) {
-        loginUser.setLoginTime(System.currentTimeMillis());
-        loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
-        // 根据uuid将loginUser缓存
-        String userKey = getTokenKey(loginUser.getToken());
-        redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
-    }
+//    /**
+//     * 刷新令牌有效期
+//     *
+//     * @param loginUser 登录信息
+//     */
+//    public void refreshToken(LoginUser loginUser) {
+//        loginUser.setLoginTime(System.currentTimeMillis());
+//        loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
+//        // 根据uuid将loginUser缓存
+//        String userKey = getTokenKey(loginUser.getToken());
+//        redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
+//    }
 
     /**
      * 设置用户代理信息
@@ -177,7 +192,7 @@ public class TokenService {
         String token = Jwts.builder()
                 .setClaims(claims)
                 //设置过期时间
-                .setExpiration(new Date(System.currentTimeMillis() + expireTime * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + (expireTime * MILLIS_MINUTE)))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
         return token;
     }
@@ -189,10 +204,12 @@ public class TokenService {
      * @return 数据声明
      */
     private Claims parseToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+
     }
 
     /**
@@ -223,4 +240,34 @@ public class TokenService {
     private String getTokenKey(String uuid) {
         return CacheConstants.LOGIN_TOKEN_KEY + uuid;
     }
+
+    /**
+     * 校验当前时间是否超过刷新时间
+     *
+     * @param claims
+     * @return
+     */
+    public boolean verifyIsExpiration(Claims claims) {
+        return claims.getExpiration().before(new Date());
+    }
+
+    /**
+     * 校验当前时间是否过期是否超过刷新时间
+     *
+     * @param claims
+     * @return
+     */
+    public boolean verifyRefreshExpiration(Claims claims) {
+        //当前时间
+        long currentTime = System.currentTimeMillis();
+        // 刷新时间
+        long refreshTime = (long) claims.get(Constants.REFRESH_TOKEN_TIME);
+
+        if (currentTime <= refreshTime) {
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
+    }
+
+
 }

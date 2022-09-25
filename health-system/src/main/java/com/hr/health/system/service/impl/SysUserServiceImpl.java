@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
 
+import com.hr.health.common.core.domain.model.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,22 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Autowired
     protected Validator validator;
+
+
+    /**
+     * 获取用户信息
+     */
+    public LoginUser getLoginUser() {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        String username = loginUser.getUsername();
+
+        //设置用户信息
+        SysUser sysUser = this.selectUserByUserName(username);
+        loginUser.setUser(sysUser);
+
+        return loginUser;
+    }
+
 
     /**
      * 根据条件分页查询用户列表

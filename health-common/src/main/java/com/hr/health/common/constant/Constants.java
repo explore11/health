@@ -89,6 +89,11 @@ public class Constants {
     public static final String REFRESH_TOKEN_TIME = "refresh_token_time";
 
     /**
+     * 权限
+     */
+    public static final String PERMISSION = "PERMISSION";
+
+    /**
      * 用户ID
      */
     public static final String JWT_USERID = "userid";

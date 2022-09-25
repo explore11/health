@@ -28,6 +28,7 @@ public enum ResultCode {
     USER_IS_DELETE(208, "用户已被删除"),
     USER_ID_NOT_EMPTY(209, "用户ID不能为空"),
     USER_INFO_NOT_EMPTY(210, "用户信息不能为空"),
+    USER_EXPIRE(211, "用户登录已过期"),
 
     /* 业务错误：301-399 */
     SPECIFIED_QUESTIONED_USER_NOT_EXIST(301, "某业务出现问题"),

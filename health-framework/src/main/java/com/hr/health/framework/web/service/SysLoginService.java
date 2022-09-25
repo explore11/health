@@ -2,6 +2,7 @@ package com.hr.health.framework.web.service;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson2.JSON;
 import com.hr.health.framework.manager.AsyncManager;
 import com.hr.health.framework.manager.factory.AsyncFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ import com.hr.health.common.utils.ip.IpUtils;
 import com.hr.health.framework.security.context.AuthenticationContextHolder;
 import com.hr.health.system.service.ISysConfigService;
 import com.hr.health.system.service.ISysUserService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 登录校验方法
@@ -86,6 +90,13 @@ public class SysLoginService {
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         recordLoginInfo(loginUser.getUserId());
+
+        //设置用户代理信息
+        tokenService.setUserAgent(loginUser);
+
+        // 设置登录时间
+        loginUser.setLoginTime(System.currentTimeMillis());
+
         // 生成token
         return tokenService.createToken(loginUser);
     }

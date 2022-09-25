@@ -24,6 +24,8 @@ import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.controller.BaseController;
 import com.hr.health.common.core.domain.AjaxResult;
 
+import javax.annotation.Resource;
+
 /**
  * 个人信息 业务处理
  *
@@ -73,12 +75,12 @@ public class SysProfileController extends BaseController {
         user.setAvatar(null);
         user.setDeptId(null);
         if (userService.updateUserProfile(user) > 0) {
-            // 更新缓存用户信息
-            sysUser.setNickName(user.getNickName());
-            sysUser.setPhonenumber(user.getPhonenumber());
-            sysUser.setEmail(user.getEmail());
-            sysUser.setSex(user.getSex());
-            tokenService.setLoginUser(loginUser);
+//            // 更新缓存用户信息
+//            sysUser.setNickName(user.getNickName());
+//            sysUser.setPhonenumber(user.getPhonenumber());
+//            sysUser.setEmail(user.getEmail());
+//            sysUser.setSex(user.getSex());
+//            tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
         return AjaxResult.error("修改个人信息异常，请联系管理员");
@@ -100,9 +102,9 @@ public class SysProfileController extends BaseController {
             return AjaxResult.error("新密码不能与旧密码相同");
         }
         if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0) {
-            // 更新缓存用户密码
-            loginUser.getUser().setPassword(SecurityUtils.encryptPassword(newPassword));
-            tokenService.setLoginUser(loginUser);
+//            // 更新缓存用户密码
+//            loginUser.getUser().setPassword(SecurityUtils.encryptPassword(newPassword));
+//            tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
         return AjaxResult.error("修改密码异常，请联系管理员");
@@ -120,9 +122,9 @@ public class SysProfileController extends BaseController {
             if (userService.updateUserAvatar(loginUser.getUsername(), avatar)) {
                 AjaxResult ajax = AjaxResult.success();
                 ajax.put("imgUrl", avatar);
-                // 更新缓存用户头像
-                loginUser.getUser().setAvatar(avatar);
-                tokenService.setLoginUser(loginUser);
+//                // 更新缓存用户头像
+//                loginUser.getUser().setAvatar(avatar);
+//                tokenService.setLoginUser(loginUser);
                 return ajax;
             }
         }

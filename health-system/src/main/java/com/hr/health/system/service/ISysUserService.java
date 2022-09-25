@@ -3,6 +3,7 @@ package com.hr.health.system.service;
 import java.util.List;
 
 import com.hr.health.common.core.domain.entity.SysUser;
+import com.hr.health.common.core.domain.model.LoginUser;
 
 /**
  * 用户 业务层
@@ -10,6 +11,14 @@ import com.hr.health.common.core.domain.entity.SysUser;
  * @author swq
  */
 public interface ISysUserService {
+
+
+    /**
+     * 获取用户信息
+     * @return
+     */
+    public LoginUser getLoginUser();
+
     /**
      * 根据条件分页查询用户列表
      *
