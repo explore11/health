@@ -1,37 +1,28 @@
 package com.hr.health.web.controller.system;
 
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-
 import com.hr.health.common.annotation.Log;
+import com.hr.health.common.constant.UserConstants;
+import com.hr.health.common.core.controller.BaseController;
+import com.hr.health.common.core.domain.AjaxResult;
 import com.hr.health.common.core.domain.entity.SysDept;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
-import com.hr.health.common.core.domain.model.LoginUser;
+import com.hr.health.common.core.page.TableDataInfo;
 import com.hr.health.common.enums.BusinessType;
-import com.hr.health.common.utils.StringUtils;
 import com.hr.health.framework.web.service.SysPermissionService;
 import com.hr.health.framework.web.service.TokenService;
 import com.hr.health.system.domain.SysUserRole;
 import com.hr.health.system.service.ISysDeptService;
 import com.hr.health.system.service.ISysRoleService;
 import com.hr.health.system.service.ISysUserService;
+import com.hr.health.system.utils.poi.ExcelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.hr.health.common.constant.UserConstants;
-import com.hr.health.common.core.controller.BaseController;
-import com.hr.health.common.core.domain.AjaxResult;
-import com.hr.health.common.core.page.TableDataInfo;
-import com.hr.health.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 角色信息
@@ -43,12 +34,6 @@ import com.hr.health.common.utils.poi.ExcelUtil;
 public class SysRoleController extends BaseController {
     @Autowired
     private ISysRoleService roleService;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private SysPermissionService permissionService;
 
     @Autowired
     private ISysUserService userService;
@@ -117,13 +102,6 @@ public class SysRoleController extends BaseController {
         role.setUpdateBy(getUsername());
 
         if (roleService.updateRole(role) > 0) {
-//            // 更新缓存用户权限
-//            LoginUser loginUser = getLoginUser();
-//            if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin()) {
-//                loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
-//                loginUser.setUser(userService.selectUserByUserName(loginUser.getUser().getUserName()));
-//                tokenService.setLoginUser(loginUser);
-//            }
             return AjaxResult.success();
         }
         return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，请联系管理员");

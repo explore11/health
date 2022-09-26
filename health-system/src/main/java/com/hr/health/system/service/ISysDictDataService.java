@@ -1,8 +1,8 @@
 package com.hr.health.system.service;
 
-import java.util.List;
-
 import com.hr.health.common.core.domain.entity.SysDictData;
+
+import java.util.List;
 
 /**
  * 字典 业务层
@@ -26,6 +26,7 @@ public interface ISysDictDataService {
      * @return 字典标签
      */
     public String selectDictLabel(String dictType, String dictValue);
+
 
     /**
      * 根据字典数据ID查询信息

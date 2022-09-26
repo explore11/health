@@ -1,8 +1,9 @@
 package com.hr.health.web.controller.system;
 
-import java.util.List;
-
 import com.hr.health.common.annotation.Log;
+import com.hr.health.common.constant.UserConstants;
+import com.hr.health.common.core.controller.BaseController;
+import com.hr.health.common.core.domain.AjaxResult;
 import com.hr.health.common.core.domain.entity.SysMenu;
 import com.hr.health.common.enums.BusinessType;
 import com.hr.health.common.utils.StringUtils;
@@ -10,17 +11,9 @@ import com.hr.health.system.service.ISysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.hr.health.common.constant.UserConstants;
-import com.hr.health.common.core.controller.BaseController;
-import com.hr.health.common.core.domain.AjaxResult;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 菜单信息

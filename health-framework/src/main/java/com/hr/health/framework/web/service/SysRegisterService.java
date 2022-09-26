@@ -1,22 +1,17 @@
 package com.hr.health.framework.web.service;
 
-import com.hr.health.framework.manager.AsyncManager;
-import com.hr.health.framework.manager.factory.AsyncFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import com.hr.health.common.constant.CacheConstants;
 import com.hr.health.common.constant.Constants;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.RegisterBody;
-import com.hr.health.common.core.redis.RedisCache;
-import com.hr.health.common.exception.user.CaptchaException;
-import com.hr.health.common.exception.user.CaptchaExpireException;
 import com.hr.health.common.utils.MessageUtils;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
-import com.hr.health.system.service.ISysConfigService;
+import com.hr.health.framework.manager.AsyncManager;
+import com.hr.health.framework.manager.factory.AsyncFactory;
 import com.hr.health.system.service.ISysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 注册校验方法
@@ -28,23 +23,11 @@ public class SysRegisterService {
     @Autowired
     private ISysUserService userService;
 
-    @Autowired
-    private ISysConfigService configService;
-
-    @Autowired
-    private RedisCache redisCache;
-
     /**
      * 注册
      */
     public String register(RegisterBody registerBody) {
         String msg = "", username = registerBody.getUsername(), password = registerBody.getPassword();
-
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
-        // 验证码开关
-        if (captchaEnabled) {
-            validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
-        }
 
         if (StringUtils.isEmpty(username)) {
             msg = "用户名不能为空";
@@ -72,25 +55,5 @@ public class SysRegisterService {
             }
         }
         return msg;
-    }
-
-    /**
-     * 校验验证码
-     *
-     * @param username 用户名
-     * @param code     验证码
-     * @param uuid     唯一标识
-     * @return 结果
-     */
-    public void validateCaptcha(String username, String code, String uuid) {
-        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.nvl(uuid, "");
-        String captcha = redisCache.getCacheObject(verifyKey);
-        redisCache.deleteObject(verifyKey);
-        if (captcha == null) {
-            throw new CaptchaExpireException();
-        }
-        if (!code.equalsIgnoreCase(captcha)) {
-            throw new CaptchaException();
-        }
     }
 }

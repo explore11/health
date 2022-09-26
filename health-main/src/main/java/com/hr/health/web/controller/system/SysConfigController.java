@@ -1,30 +1,23 @@
 package com.hr.health.web.controller.system;
 
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-
 import com.hr.health.common.annotation.Log;
+import com.hr.health.common.constant.UserConstants;
+import com.hr.health.common.core.controller.BaseController;
+import com.hr.health.common.core.domain.AjaxResult;
+import com.hr.health.common.core.page.TableDataInfo;
 import com.hr.health.common.enums.BusinessType;
 import com.hr.health.system.domain.SysConfig;
 import com.hr.health.system.service.ISysConfigService;
+import com.hr.health.system.utils.poi.ExcelUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.hr.health.common.constant.UserConstants;
-import com.hr.health.common.core.controller.BaseController;
-import com.hr.health.common.core.domain.AjaxResult;
-import com.hr.health.common.core.page.TableDataInfo;
-import com.hr.health.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 参数配置 信息操作处理
@@ -115,14 +108,4 @@ public class SysConfigController extends BaseController {
         return success();
     }
 
-    /**
-     * 刷新参数缓存
-     */
-    @PreAuthorize("@ss.hasPermi('system:config:remove')")
-    @Log(title = "参数管理", businessType = BusinessType.CLEAN)
-    @DeleteMapping("/refreshCache")
-    public AjaxResult refreshCache() {
-        configService.resetConfigCache();
-        return AjaxResult.success();
-    }
 }

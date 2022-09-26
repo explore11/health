@@ -1,13 +1,12 @@
 package com.hr.health.system.service.impl;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.hr.health.common.core.domain.entity.SysDictData;
-import com.hr.health.common.utils.DictUtils;
 import com.hr.health.system.mapper.SysDictDataMapper;
 import com.hr.health.system.service.ISysDictDataService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 字典 业务层处理
@@ -61,10 +60,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @Override
     public void deleteDictDataByIds(Long[] dictCodes) {
         for (Long dictCode : dictCodes) {
-            SysDictData data = selectDictDataById(dictCode);
             dictDataMapper.deleteDictDataById(dictCode);
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
-            DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
     }
 
@@ -76,12 +72,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      */
     @Override
     public int insertDictData(SysDictData data) {
-        int row = dictDataMapper.insertDictData(data);
-        if (row > 0) {
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
-            DictUtils.setDictCache(data.getDictType(), dictDatas);
-        }
-        return row;
+        return dictDataMapper.insertDictData(data);
     }
 
     /**
@@ -92,11 +83,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      */
     @Override
     public int updateDictData(SysDictData data) {
-        int row = dictDataMapper.updateDictData(data);
-        if (row > 0) {
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
-            DictUtils.setDictCache(data.getDictType(), dictDatas);
-        }
-        return row;
+        return dictDataMapper.updateDictData(data);
     }
 }

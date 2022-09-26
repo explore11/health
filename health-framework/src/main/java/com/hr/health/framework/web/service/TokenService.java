@@ -1,36 +1,27 @@
 package com.hr.health.framework.web.service;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import com.alibaba.fastjson2.JSON;
-import com.hr.health.common.core.domain.entity.SysUser;
-import com.hr.health.framework.web.domain.server.Sys;
-import com.hr.health.system.service.ISysUserOnlineService;
-import com.hr.health.system.service.ISysUserService;
-import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import com.hr.health.common.constant.CacheConstants;
 import com.hr.health.common.constant.Constants;
 import com.hr.health.common.core.domain.model.LoginUser;
-import com.hr.health.common.core.redis.RedisCache;
 import com.hr.health.common.utils.ServletUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.ip.AddressUtils;
 import com.hr.health.common.utils.ip.IpUtils;
-import com.hr.health.common.utils.uuid.IdUtils;
+import com.hr.health.system.service.ISysUserService;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * token验证处理
@@ -61,8 +52,8 @@ public class TokenService {
 
     private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
 
-    @Autowired
-    private RedisCache redisCache;
+//    @Autowired
+//    private RedisCache redisCache;
 
     @Resource
     private ISysUserService iSysUserService;
@@ -106,15 +97,15 @@ public class TokenService {
 //        }
 //    }
 
-    /**
-     * 删除用户身份信息
-     */
-    public void delLoginUser(String token) {
-        if (StringUtils.isNotEmpty(token)) {
-            String userKey = getTokenKey(token);
-            redisCache.deleteObject(userKey);
-        }
-    }
+//    /**
+//     * 删除用户身份信息
+//     */
+//    public void delLoginUser(String token) {
+//        if (StringUtils.isNotEmpty(token)) {
+//            String userKey = getTokenKey(token);
+//            redisCache.deleteObject(userKey);
+//        }
+//    }
 
     /**
      * 创建令牌

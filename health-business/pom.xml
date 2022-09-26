@@ -22,6 +22,10 @@
             <groupId>com.health</groupId>
             <artifactId>health-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.health</groupId>
+            <artifactId>health-system</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
