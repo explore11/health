@@ -57,6 +57,14 @@ public class Result<T> implements Serializable {
     }
 
 
+    public static <T> Result<T> failure() {
+        return new Result<>(ResultCode.FAILURE);
+    }
+
+    public static <T> Result<T> failure(Integer code, String message) {
+        return new Result<>(code, message);
+    }
+
     public static <T> Result<T> failure(ResultCode resultCode) {
         return new Result<>(resultCode);
     }
@@ -71,6 +79,20 @@ public class Result<T> implements Serializable {
 
     public static <T> Result<T> check(boolean flag, ResultCode resultCode) {
         return flag ? success() : failure(resultCode);
+    }
+
+    /**
+     * 判断返回
+     * @param row
+     * @param <T>
+     * @return
+     */
+    public static <T> Result<T> judge(int row) {
+        if (row > 0) {
+            return Result.success();
+        } else {
+            return Result.failure();
+        }
     }
 
     @Transient

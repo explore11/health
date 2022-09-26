@@ -1,19 +1,25 @@
 package com.hr.health.framework.web.service;
 
 import com.hr.health.common.constant.Constants;
+import com.hr.health.common.core.domain.AjaxResult;
+import com.hr.health.common.core.domain.entity.SysMenu;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
 import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.exception.user.UserPasswordNotMatchException;
 import com.hr.health.common.utils.DateUtils;
 import com.hr.health.common.utils.MessageUtils;
+import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.ServletUtils;
 import com.hr.health.common.utils.ip.IpUtils;
 import com.hr.health.framework.manager.AsyncManager;
 import com.hr.health.framework.manager.factory.AsyncFactory;
 import com.hr.health.framework.security.context.AuthenticationContextHolder;
+import com.hr.health.system.domain.vo.RouterVo;
 import com.hr.health.system.service.ISysConfigService;
+import com.hr.health.system.service.ISysMenuService;
 import com.hr.health.system.service.ISysUserService;
+import jdk.internal.org.objectweb.asm.Handle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,6 +28,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 登录校验方法
@@ -36,14 +46,15 @@ public class SysLoginService {
     @Resource
     private AuthenticationManager authenticationManager;
 
-//    @Autowired
-//    private RedisCache redisCache;
+    @Autowired
+    private ISysMenuService menuService;
+
+    @Autowired
+    private SysPermissionService permissionService;
 
     @Autowired
     private ISysUserService userService;
 
-    @Autowired
-    private ISysConfigService configService;
 
     /**
      * 登录验证
@@ -55,11 +66,6 @@ public class SysLoginService {
      * @return 结果
      */
     public String login(String username, String password, String code, String uuid) {
-//        boolean captchaEnabled = configService.selectCaptchaEnabled();
-//        // 验证码开关
-//        if (captchaEnabled) {
-//            validateCaptcha(username, code, uuid);
-//        }
         // 用户验证
         Authentication authentication = null;
         try {
@@ -92,28 +98,6 @@ public class SysLoginService {
         return tokenService.createToken(loginUser);
     }
 
-//    /**
-//     * 校验验证码
-//     *
-//     * @param username 用户名
-//     * @param code     验证码
-//     * @param uuid     唯一标识
-//     * @return 结果
-//     */
-//    public void validateCaptcha(String username, String code, String uuid) {
-//        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.nvl(uuid, "");
-//        String captcha = redisCache.getCacheObject(verifyKey);
-//        redisCache.deleteObject(verifyKey);
-//        if (captcha == null) {
-//            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
-//            throw new CaptchaExpireException();
-//        }
-//        if (!code.equalsIgnoreCase(captcha)) {
-//            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
-//            throw new CaptchaException();
-//        }
-//    }
-
     /**
      * 记录登录信息
      *
@@ -125,5 +109,38 @@ public class SysLoginService {
         sysUser.setLoginIp(IpUtils.getIpAddr(ServletUtils.getRequest()));
         sysUser.setLoginDate(DateUtils.getNowDate());
         userService.updateUserProfile(sysUser);
+    }
+
+    /**
+     * 获取用户信息
+     *
+     * @return
+     */
+    public Map<String, Object> getInfo() {
+        Map<String, Object> map = new HashMap<>();
+
+        SysUser user = SecurityUtils.getLoginUser().getUser();
+        // 角色集合
+        Set<String> roles = permissionService.getRolePermission(user);
+        // 权限集合
+        Set<String> permissions = permissionService.getMenuPermission(user);
+
+        //返回数据
+        map.put("user", user);
+        map.put("roles", roles);
+        map.put("permissions", permissions);
+
+        return map;
+    }
+
+    /**
+     * 获取路由信息
+     *
+     * @return
+     */
+    public List<RouterVo> getRouters() {
+        Long userId = SecurityUtils.getUserId();
+        List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
+        return menuService.buildMenus(menus);
     }
 }

@@ -2,22 +2,22 @@ package com.hr.health.web.controller.system;
 
 import com.hr.health.common.constant.Constants;
 import com.hr.health.common.core.domain.AjaxResult;
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysMenu;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginBody;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.framework.web.service.SysLoginService;
 import com.hr.health.framework.web.service.SysPermissionService;
+import com.hr.health.system.domain.vo.RouterVo;
 import com.hr.health.system.service.ISysMenuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,15 +27,11 @@ import java.util.Set;
  */
 @Api(tags = "登录")
 @RestController
+@RequestMapping("/system/user")
 public class SysLoginController {
     @Autowired
     private SysLoginService loginService;
 
-    @Autowired
-    private ISysMenuService menuService;
-
-    @Autowired
-    private SysPermissionService permissionService;
 
     /**
      * 登录方法
@@ -45,12 +41,10 @@ public class SysLoginController {
      */
     @PostMapping("/login")
     @ApiOperation("登录")
-    public AjaxResult login(@RequestBody LoginBody loginBody) {
-        AjaxResult ajax = AjaxResult.success();
+    public Result<String> login(@RequestBody LoginBody loginBody) {
         // 生成令牌
-        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),loginBody.getUuid());
-        ajax.put(Constants.TOKEN, token);
-        return ajax;
+        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(), loginBody.getUuid());
+        return Result.success(token);
     }
 
     /**
@@ -58,18 +52,11 @@ public class SysLoginController {
      *
      * @return 用户信息
      */
+    @ApiOperation("获取用户信息")
     @GetMapping("getInfo")
-    public AjaxResult getInfo() {
-        SysUser user = SecurityUtils.getLoginUser().getUser();
-        // 角色集合
-        Set<String> roles = permissionService.getRolePermission(user);
-        // 权限集合
-        Set<String> permissions = permissionService.getMenuPermission(user);
-        AjaxResult ajax = AjaxResult.success();
-        ajax.put("user", user);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
-        return ajax;
+    public Result<Map<String, Object>> getInfo() {
+        Map<String, Object> map = loginService.getInfo();
+        return Result.success(map);
     }
 
     /**
@@ -77,10 +64,10 @@ public class SysLoginController {
      *
      * @return 路由信息
      */
+    @ApiOperation("获取路由信息")
     @GetMapping("getRouters")
-    public AjaxResult getRouters() {
-        Long userId = SecurityUtils.getUserId();
-        List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
-        return AjaxResult.success(menuService.buildMenus(menus));
+    public Result<List<RouterVo>> getRouters() {
+        List<RouterVo> routers = loginService.getRouters();
+        return Result.success(routers);
     }
 }

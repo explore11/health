@@ -3,10 +3,13 @@ package com.hr.health.web.controller.system;
 import com.hr.health.common.annotation.Log;
 import com.hr.health.common.core.controller.BaseController;
 import com.hr.health.common.core.domain.AjaxResult;
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.page.TableDataInfo;
 import com.hr.health.common.enums.BusinessType;
 import com.hr.health.system.domain.SysNotice;
 import com.hr.health.system.service.ISysNoticeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +22,7 @@ import java.util.List;
  *
  * @author swq
  */
+@Api(tags = "公告信息")
 @RestController
 @RequestMapping("/system/notice")
 public class SysNoticeController extends BaseController {
@@ -28,52 +32,57 @@ public class SysNoticeController extends BaseController {
     /**
      * 获取通知公告列表
      */
+    @ApiOperation("获取通知公告列表")
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysNotice notice) {
+    public Result<TableDataInfo> list(SysNotice notice) {
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
-        return getDataTable(list);
+        return Result.success(getDataTable(list));
     }
 
     /**
      * 根据通知公告编号获取详细信息
      */
+    @ApiOperation("根据通知公告编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:notice:query')")
     @GetMapping(value = "/{noticeId}")
-    public AjaxResult getInfo(@PathVariable Long noticeId) {
-        return AjaxResult.success(noticeService.selectNoticeById(noticeId));
+    public Result<SysNotice> getInfo(@PathVariable Long noticeId) {
+        return Result.success(noticeService.selectNoticeById(noticeId));
     }
 
     /**
      * 新增通知公告
      */
+    @ApiOperation("新增通知公告")
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@Validated @RequestBody SysNotice notice) {
+    public Result add(@Validated @RequestBody SysNotice notice) {
         notice.setCreateBy(getUsername());
-        return toAjax(noticeService.insertNotice(notice));
+        return Result.judge(noticeService.insertNotice(notice));
     }
 
     /**
      * 修改通知公告
      */
+    @ApiOperation("修改通知公告")
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@Validated @RequestBody SysNotice notice) {
+    public Result edit(@Validated @RequestBody SysNotice notice) {
         notice.setUpdateBy(getUsername());
-        return toAjax(noticeService.updateNotice(notice));
+        return Result.judge(noticeService.updateNotice(notice));
     }
 
     /**
      * 删除通知公告
      */
+    @ApiOperation("删除通知公告")
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public AjaxResult remove(@PathVariable Long[] noticeIds) {
-        return toAjax(noticeService.deleteNoticeByIds(noticeIds));
+    public Result remove(@PathVariable Long[] noticeIds) {
+        return Result.judge(noticeService.deleteNoticeByIds(noticeIds));
     }
 }

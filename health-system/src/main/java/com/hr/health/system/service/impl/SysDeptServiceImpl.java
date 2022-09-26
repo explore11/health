@@ -117,6 +117,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public SysDept selectDeptById(Long deptId) {
+        this.checkDeptDataScope(deptId);
         return deptMapper.selectDeptById(deptId);
     }
 
@@ -266,6 +267,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public int deleteDeptById(Long deptId) {
+        this.checkDeptDataScope(deptId);
         return deptMapper.deleteDeptById(deptId);
     }
 
