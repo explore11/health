@@ -2,7 +2,6 @@ package com.hr.health.system.service.impl;
 
 import com.hr.health.common.config.HealthConfig;
 import com.hr.health.common.constant.Constants;
-import com.hr.health.common.core.domain.AjaxResult;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.enums.ResultCode;
 import com.hr.health.common.utils.StringUtils;

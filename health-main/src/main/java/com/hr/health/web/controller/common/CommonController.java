@@ -1,18 +1,11 @@
 package com.hr.health.web.controller.common;
 
-import com.hr.health.common.config.HealthConfig;
-import com.hr.health.common.constant.Constants;
-import com.hr.health.common.core.domain.AjaxResult;
 import com.hr.health.common.core.domain.Result;
-import com.hr.health.common.utils.StringUtils;
-import com.hr.health.common.utils.file.FileUploadUtils;
-import com.hr.health.common.utils.file.FileUtils;
 import com.hr.health.system.service.CommonService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,6 +37,7 @@ public class CommonController {
      * @param delete   是否删除
      */
     @GetMapping("/download")
+    @ApiOperation("通用下载请求")
     public void fileDownload(String fileName, Boolean delete, HttpServletResponse response, HttpServletRequest request) {
         commonService.fileDownload(fileName, delete, request, response);
     }
@@ -53,6 +46,7 @@ public class CommonController {
      * 通用上传请求（单个）
      */
     @PostMapping("/upload")
+    @ApiOperation("通用上传请求（单个）")
     public Result uploadFile(MultipartFile file) throws Exception {
         return commonService.uploadFile(file);
     }
@@ -61,6 +55,7 @@ public class CommonController {
      * 通用上传请求（多个）
      */
     @PostMapping("/uploads")
+    @ApiOperation("通用上传请求（多个）")
     public Result uploadFiles(List<MultipartFile> files) throws Exception {
         return commonService.uploadFiles(files);
     }
@@ -69,6 +64,7 @@ public class CommonController {
      * 本地资源通用下载
      */
     @GetMapping("/download/resource")
+    @ApiOperation("本地资源通用下载")
     public void resourceDownload(String resource, HttpServletRequest request, HttpServletResponse response) throws Exception {
         commonService.resourceDownload(resource, request, response);
     }
