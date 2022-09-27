@@ -1,7 +1,6 @@
 package com.hr.health.framework.web.service;
 
 import com.hr.health.common.constant.Constants;
-import com.hr.health.common.core.domain.AjaxResult;
 import com.hr.health.common.core.domain.entity.SysMenu;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
@@ -16,10 +15,8 @@ import com.hr.health.framework.manager.AsyncManager;
 import com.hr.health.framework.manager.factory.AsyncFactory;
 import com.hr.health.framework.security.context.AuthenticationContextHolder;
 import com.hr.health.system.domain.vo.RouterVo;
-import com.hr.health.system.service.ISysConfigService;
 import com.hr.health.system.service.ISysMenuService;
 import com.hr.health.system.service.ISysUserService;
-import jdk.internal.org.objectweb.asm.Handle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

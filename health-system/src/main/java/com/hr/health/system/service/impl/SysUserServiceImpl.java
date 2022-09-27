@@ -1,5 +1,7 @@
 package com.hr.health.system.service.impl;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.hr.health.common.config.HealthConfig;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.Result;
@@ -75,6 +77,27 @@ public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     private ISysPostService postService;
 
+
+    /**
+     * 解析二维码
+     * @return
+     */
+    @Override
+    public Result parseQrCode() {
+        String decode = QrCodeUtil.decode(FileUtil.file("d:/qrcode.jpg"));
+        return Result.success(decode);
+    }
+
+    /**
+     * 生成二维码
+     * @param user
+     * @return
+     */
+    @Override
+    public Result generateQrCode(SysUser user) {
+        QrCodeUtil.generate("111", 300, 300, FileUtil.file("d:/qrcode1.jpg"));
+        return Result.success();
+    }
 
     /**
      * 修改状态

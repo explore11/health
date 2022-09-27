@@ -300,4 +300,19 @@ public interface ISysUserService {
      * @return
      */
     Result changeStatus(SysUser user);
+
+    /**
+     * 生成二维码
+     * @param user
+     * @return
+     */
+    Result generateQrCode(SysUser user);
+
+    /**
+     * 解析二维码
+     * @return
+     */
+    Result parseQrCode();
+
+
 }

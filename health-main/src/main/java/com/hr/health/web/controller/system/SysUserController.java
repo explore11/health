@@ -42,6 +42,28 @@ public class SysUserController extends BaseController {
     @Autowired
     private ISysDeptService deptService;
 
+
+    /**
+     * 解析二维码
+     */
+    @ApiOperation("解析二维码")
+    @PreAuthorize("@ss.hasPermi('system:user:parseQrCode')")
+    @GetMapping("/parseQrCode")
+    public Result parseQrCode() {
+        return userService.parseQrCode();
+    }
+
+    /**
+     * 生成二维码
+     */
+    @ApiOperation("生成二维码")
+    @PreAuthorize("@ss.hasPermi('system:user:generateQrcode')")
+    @GetMapping("/generateQrCode")
+    public Result generateQrCode(SysUser user) {
+        return userService.generateQrCode(user);
+    }
+
+
     /**
      * 获取用户列表
      */
@@ -202,4 +224,6 @@ public class SysUserController extends BaseController {
     public Result deptTree(SysDept dept) {
         return Result.success(deptService.selectDeptTreeList(dept));
     }
+
+
 }
