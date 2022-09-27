@@ -1,5 +1,6 @@
 package com.hr.health.system.service;
 
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.TreeSelect;
 import com.hr.health.common.core.domain.entity.SysDept;
 
@@ -121,4 +122,32 @@ public interface ISysDeptService {
      * @return 结果
      */
     int deleteDeptById(Long deptId);
+
+    /**
+     * 查询部门列表（排除节点）
+     * @param deptId
+     * @return
+     */
+    List<SysDept> excludeChild(Long deptId);
+
+    /**
+     * 修改部门
+     * @param dept
+     * @return
+     */
+    Result edit(SysDept dept);
+
+    /**
+     * 删除部门
+     * @param deptId
+     * @return
+     */
+    Result remove(Long deptId);
+
+    /**
+     * 获取对应角色部门树列表
+     * @param roleId
+     * @return
+     */
+    Result deptTree(Long roleId);
 }

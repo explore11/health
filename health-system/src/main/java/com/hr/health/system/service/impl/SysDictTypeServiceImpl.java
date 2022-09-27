@@ -4,6 +4,7 @@ import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.entity.SysDictData;
 import com.hr.health.common.core.domain.entity.SysDictType;
 import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.system.mapper.SysDictDataMapper;
 import com.hr.health.system.mapper.SysDictTypeMapper;
@@ -110,6 +111,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      */
     @Override
     public int insertDictType(SysDictType dict) {
+        dict.setCreateBy(SecurityUtils.getUsername());
         return dictTypeMapper.insertDictType(dict);
     }
 
@@ -122,6 +124,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     @Transactional
     public int updateDictType(SysDictType dict) {
+        dict.setUpdateBy(SecurityUtils.getUsername());
         SysDictType oldDict = dictTypeMapper.selectDictTypeById(dict.getDictId());
         dictDataMapper.updateDictDataType(oldDict.getDictType(), dict.getDictType());
         return dictTypeMapper.updateDictType(dict);

@@ -49,9 +49,7 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list/exclude/{deptId}")
     public Result<List<SysDept>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
-        List<SysDept> depts = deptService.selectDeptList(new SysDept());
-        //过滤
-        depts.removeIf(d -> d.getDeptId().intValue() == deptId || ArrayUtils.contains(StringUtils.split(d.getAncestors(), ","), deptId + ""));
+        List<SysDept> depts = deptService.excludeChild(deptId);
         return Result.success(depts);
     }
 
@@ -77,9 +75,7 @@ public class SysDeptController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept))) {
             return Result.failure(ResultCode.DATA_ALREADY_EXISTED.code(), ResultCode.DATA_ALREADY_EXISTED.message());
         }
-
         //新增操作
-        dept.setCreateBy(getUsername());
         return Result.judge(deptService.insertDept(dept));
     }
 
@@ -91,22 +87,7 @@ public class SysDeptController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public Result edit(@Validated @RequestBody SysDept dept) {
-        // 检查数据域
-        Long deptId = dept.getDeptId();
-        deptService.checkDeptDataScope(deptId);
-
-        //校验
-        if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept))) {
-            return Result.failure(ResultCode.DATA_ALREADY_EXISTED.code(), ResultCode.DATA_ALREADY_EXISTED.message());
-        } else if (dept.getParentId().equals(deptId)) {
-            return Result.failure(ResultCode.DATA_PARENT_DEPT_NO_SELF.code(), ResultCode.DATA_PARENT_DEPT_NO_SELF.message());
-        } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && deptService.selectNormalChildrenDeptById(deptId) > 0) {
-            return Result.failure(ResultCode.DATA_DEPT_CONTAIN_NO_STOP_SON_DEPT.code(), ResultCode.DATA_DEPT_CONTAIN_NO_STOP_SON_DEPT.message());
-        }
-
-        // 修改操作
-        dept.setUpdateBy(getUsername());
-        return Result.judge(deptService.updateDept(dept));
+        return deptService.edit(dept);
     }
 
     /**
@@ -117,15 +98,6 @@ public class SysDeptController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
     public Result remove(@PathVariable Long deptId) {
-        // 校验
-        if (deptService.hasChildByDeptId(deptId)) {
-            return Result.failure(ResultCode.DATA_DEPT_CONTAIN_SON_DEPT_NO_DEL.code(), ResultCode.DATA_DEPT_CONTAIN_SON_DEPT_NO_DEL.message());
-        }
-        if (deptService.checkDeptExistUser(deptId)) {
-            return Result.failure(ResultCode.DATA_DEPT_EXISTED_DEPT_USER_NO_DEL.code(), ResultCode.DATA_DEPT_EXISTED_DEPT_USER_NO_DEL.message());
-        }
-
-        // 删除操作
-        return Result.judge(deptService.deleteDeptById(deptId));
+        return deptService.remove(deptId);
     }
 }

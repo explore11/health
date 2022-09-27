@@ -3,6 +3,7 @@ package com.hr.health.system.service;
 import java.util.List;
 import java.util.Set;
 
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.system.domain.SysUserRole;
 
@@ -87,7 +88,7 @@ public interface ISysRoleService {
      *
      * @param roleId 角色id
      */
-    void checkRoleDataScope(Long roleId);
+//    void checkRoleDataScope(Long roleId);
 
     /**
      * 通过角色ID查询角色使用数量
@@ -170,4 +171,25 @@ public interface ISysRoleService {
      * @return 结果
      */
     int insertAuthUsers(Long roleId, Long[] userIds);
+
+    /**
+     * 新增角色
+     * @param role
+     * @return
+     */
+    Result add(SysRole role);
+
+    /**
+     * 修改保存角色
+     * @param role
+     * @return
+     */
+    Result edit(SysRole role);
+
+    /**
+     * 状态修改
+     * @param role
+     * @return
+     */
+    Result changeStatus(SysRole role);
 }

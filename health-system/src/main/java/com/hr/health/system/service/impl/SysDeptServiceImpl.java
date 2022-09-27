@@ -1,19 +1,13 @@
 package com.hr.health.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.hr.health.common.annotation.DataScope;
 import com.hr.health.common.constant.UserConstants;
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.TreeSelect;
 import com.hr.health.common.core.domain.entity.SysDept;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.text.Convert;
+import com.hr.health.common.enums.ResultCode;
 import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
@@ -21,6 +15,12 @@ import com.hr.health.common.utils.spring.SpringUtils;
 import com.hr.health.system.mapper.SysDeptMapper;
 import com.hr.health.system.mapper.SysRoleMapper;
 import com.hr.health.system.service.ISysDeptService;
+import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 部门管理 服务实现
@@ -36,13 +36,80 @@ public class SysDeptServiceImpl implements ISysDeptService {
     private SysRoleMapper roleMapper;
 
     /**
+     * 获取对应角色部门树列表
+     * @param roleId
+     * @return
+     */
+    @Override
+    public Result deptTree(Long roleId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("checkedKeys", this.selectDeptListByRoleId(roleId));
+        map.put("depts", this.selectDeptTreeList(new SysDept()));
+        return Result.success(map);
+    }
+
+    /**
+     * 删除部门
+     *
+     * @param deptId
+     * @return
+     */
+    @Override
+    public Result remove(Long deptId) {
+        // 校验
+        if (this.hasChildByDeptId(deptId)) {
+            return Result.failure(ResultCode.DATA_DEPT_CONTAIN_SON_DEPT_NO_DEL.code(), ResultCode.DATA_DEPT_CONTAIN_SON_DEPT_NO_DEL.message());
+        }
+        if (this.checkDeptExistUser(deptId)) {
+            return Result.failure(ResultCode.DATA_DEPT_EXISTED_DEPT_USER_NO_DEL.code(), ResultCode.DATA_DEPT_EXISTED_DEPT_USER_NO_DEL.message());
+        }
+        // 删除操作
+        return Result.judge(this.deleteDeptById(deptId));
+    }
+
+    /**
+     * 修改部门
+     *
+     * @param dept
+     * @return
+     */
+    @Override
+    public Result edit(SysDept dept) {
+        Long deptId = dept.getDeptId();
+        //校验
+        if (UserConstants.NOT_UNIQUE.equals(this.checkDeptNameUnique(dept))) {
+            return Result.failure(ResultCode.DATA_ALREADY_EXISTED.code(), ResultCode.DATA_ALREADY_EXISTED.message());
+        } else if (dept.getParentId().equals(deptId)) {
+            return Result.failure(ResultCode.DATA_PARENT_DEPT_NO_SELF.code(), ResultCode.DATA_PARENT_DEPT_NO_SELF.message());
+        } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && this.selectNormalChildrenDeptById(deptId) > 0) {
+            return Result.failure(ResultCode.DATA_DEPT_CONTAIN_NO_STOP_SON_DEPT.code(), ResultCode.DATA_DEPT_CONTAIN_NO_STOP_SON_DEPT.message());
+        }
+        // 修改操作
+        dept.setUpdateBy(SecurityUtils.getUsername());
+        return Result.judge(this.updateDept(dept));
+    }
+
+    /**
+     * 查询部门列表（排除节点）
+     *
+     * @param deptId
+     * @return
+     */
+    @Override
+    public List<SysDept> excludeChild(Long deptId) {
+        List<SysDept> depts = this.selectDeptList(new SysDept());
+        //过滤
+        depts.removeIf(d -> d.getDeptId().intValue() == deptId || ArrayUtils.contains(StringUtils.split(d.getAncestors(), ","), deptId + ""));
+        return depts;
+    }
+
+    /**
      * 查询部门管理数据
      *
      * @param dept 部门信息
      * @return 部门信息集合
      */
     @Override
-    @DataScope(deptAlias = "d")
     public List<SysDept> selectDeptList(SysDept dept) {
         return deptMapper.selectDeptList(dept);
     }
@@ -117,7 +184,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public SysDept selectDeptById(Long deptId) {
-        this.checkDeptDataScope(deptId);
         return deptMapper.selectDeptById(deptId);
     }
 
@@ -197,6 +263,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public int insertDept(SysDept dept) {
+        dept.setCreateBy(SecurityUtils.getUsername());
         SysDept info = deptMapper.selectDeptById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
@@ -267,7 +334,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public int deleteDeptById(Long deptId) {
-        this.checkDeptDataScope(deptId);
         return deptMapper.deleteDeptById(deptId);
     }
 

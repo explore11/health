@@ -2,6 +2,9 @@ package com.hr.health.system.service.impl;
 
 import java.util.List;
 
+import com.hr.health.common.core.domain.Result;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.hr.health.common.constant.UserConstants;
@@ -24,6 +27,41 @@ public class SysPostServiceImpl implements ISysPostService {
 
     @Autowired
     private SysUserPostMapper userPostMapper;
+
+
+    /**
+     * 修改岗位
+     * @param post
+     * @return
+     */
+    @Override
+    public Result edit(SysPost post) {
+        if (UserConstants.NOT_UNIQUE.equals(this.checkPostNameUnique(post))) {
+            return Result.failure(ResultCode.DATA_POST_NAME_ALREADY_EXISTED);
+        } else if (UserConstants.NOT_UNIQUE.equals(this.checkPostCodeUnique(post))) {
+            return Result.failure(ResultCode.DATA_POST_NUMBER_ALREADY_EXISTED);
+        }
+        //修改操作
+        post.setUpdateBy(SecurityUtils.getUsername());
+        return Result.judge(this.updatePost(post));
+    }
+
+    /**
+     * 新增岗位
+     * @param post
+     * @return
+     */
+    @Override
+    public Result add(SysPost post) {
+        if (UserConstants.NOT_UNIQUE.equals(this.checkPostNameUnique(post))) {
+            return Result.failure(ResultCode.DATA_POST_NAME_ALREADY_EXISTED);
+        } else if (UserConstants.NOT_UNIQUE.equals(this.checkPostCodeUnique(post))) {
+            return Result.failure(ResultCode.DATA_POST_NUMBER_ALREADY_EXISTED);
+        }
+        //新增操作
+        post.setCreateBy(SecurityUtils.getUsername());
+        return Result.judge(this.insertPost(post));
+    }
 
     /**
      * 查询岗位信息集合

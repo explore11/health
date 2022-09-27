@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.TreeSelect;
 import com.hr.health.common.core.domain.entity.SysMenu;
 import com.hr.health.system.domain.vo.RouterVo;
@@ -142,4 +143,32 @@ public interface ISysMenuService {
      * @return 结果
      */
     String checkMenuNameUnique(SysMenu menu);
+
+    /**
+     * 加载对应角色菜单列表树
+     * @param roleId
+     * @return
+     */
+    Map<String, Object> roleMenuTreeSelect(Long roleId);
+
+    /**
+     * 新增菜单
+     * @param menu
+     * @return
+     */
+    Result add(SysMenu menu);
+
+    /**
+     * 修改菜单
+     * @param menu
+     * @return
+     */
+    Result edit(SysMenu menu);
+
+    /**
+     * 删除菜单
+     * @param menuId
+     * @return
+     */
+    Result remove(Long menuId);
 }

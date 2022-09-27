@@ -1,15 +1,12 @@
 package com.hr.health.web.controller.system;
 
 import com.hr.health.common.annotation.Log;
-import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.controller.BaseController;
 import com.hr.health.common.core.domain.Result;
-import com.hr.health.common.core.domain.entity.SysDept;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.page.TableDataInfo;
 import com.hr.health.common.enums.BusinessType;
-import com.hr.health.common.enums.ResultCode;
 import com.hr.health.system.domain.SysUserRole;
 import com.hr.health.system.service.ISysDeptService;
 import com.hr.health.system.service.ISysRoleService;
@@ -23,9 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 角色信息
@@ -83,7 +78,6 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/{roleId}")
     public Result<SysRole> getInfo(@PathVariable Long roleId) {
-        roleService.checkRoleDataScope(roleId);
         return Result.success(roleService.selectRoleById(roleId));
     }
 
@@ -95,14 +89,7 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public Result add(@Validated @RequestBody SysRole role) {
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
-            return Result.failure(ResultCode.USER_ROLE_EXIST.code(), ResultCode.USER_ROLE_EXIST.message());
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
-            return Result.failure(ResultCode.USER_ROLE_PERMISSIONS_EXIST.code(), ResultCode.USER_ROLE_PERMISSIONS_EXIST.message());
-        }
-
-        role.setCreateBy(getUsername());
-        return Result.judge(roleService.insertRole(role));
+        return roleService.add(role);
     }
 
     /**
@@ -113,16 +100,7 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/edit")
     public Result edit(@Validated @RequestBody SysRole role) {
-        roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
-            return Result.failure(ResultCode.USER_ROLE_EXIST.code(), ResultCode.USER_ROLE_EXIST.message());
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
-            return Result.failure(ResultCode.USER_ROLE_PERMISSIONS_EXIST.code(), ResultCode.USER_ROLE_PERMISSIONS_EXIST.message());
-        }
-
-        role.setUpdateBy(getUsername());
-        return Result.judge(roleService.updateRole(role));
+        return roleService.edit(role);
     }
 
     /**
@@ -134,7 +112,6 @@ public class SysRoleController extends BaseController {
     @PutMapping("/dataScope")
     public Result dataScope(@RequestBody SysRole role) {
         roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
         return Result.judge(roleService.authDataScope(role));
     }
 
@@ -146,10 +123,7 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public Result changeStatus(@RequestBody SysRole role) {
-        roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
-        role.setUpdateBy(getUsername());
-        return Result.judge(roleService.updateRoleStatus(role));
+        return roleService.changeStatus(role);
     }
 
     /**
@@ -227,7 +201,6 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
     public Result selectAuthUserAll(Long roleId, Long[] userIds) {
-        roleService.checkRoleDataScope(roleId);
         return Result.judge(roleService.insertAuthUsers(roleId, userIds));
     }
 
@@ -238,10 +211,6 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/deptTree/{roleId}")
     public Result deptTree(@PathVariable("roleId") Long roleId) {
-
-        Map<String,Object> map =new HashMap<>();
-        map.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
-        map.put("depts", deptService.selectDeptTreeList(new SysDept()));
-        return Result.success(map);
+        return deptService.deptTree(roleId);
     }
 }

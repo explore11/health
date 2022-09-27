@@ -79,14 +79,7 @@ public class SysPostController extends BaseController {
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
     public Result add(@Validated @RequestBody SysPost post) {
-        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post))) {
-            return Result.failure(ResultCode.DATA_POST_NAME_ALREADY_EXISTED);
-        } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post))) {
-            return Result.failure(ResultCode.DATA_POST_NUMBER_ALREADY_EXISTED);
-        }
-
-        post.setCreateBy(getUsername());
-        return Result.judge(postService.insertPost(post));
+        return postService.add(post);
     }
 
     /**
@@ -97,13 +90,7 @@ public class SysPostController extends BaseController {
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public Result edit(@Validated @RequestBody SysPost post) {
-        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post))) {
-            return Result.failure(ResultCode.DATA_POST_NAME_ALREADY_EXISTED);
-        } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post))) {
-            return Result.failure(ResultCode.DATA_POST_NUMBER_ALREADY_EXISTED);
-        }
-        post.setUpdateBy(getUsername());
-        return Result.judge(postService.updatePost(post));
+        return postService.edit(post);
     }
 
     /**

@@ -1,11 +1,12 @@
 package com.hr.health.framework.aspectj;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-
+import com.hr.health.common.annotation.RateLimiter;
+import com.hr.health.common.enums.LimitType;
+import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.utils.ServletUtils;
+import com.hr.health.common.utils.StringUtils;
+import com.hr.health.common.utils.ip.IpUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
@@ -13,21 +14,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.stereotype.Component;
-import com.hr.health.common.annotation.RateLimiter;
-import com.hr.health.common.enums.LimitType;
-import com.hr.health.common.exception.ServiceException;
-import com.hr.health.common.utils.ServletUtils;
-import com.hr.health.common.utils.StringUtils;
-import com.hr.health.common.utils.ip.IpUtils;
+
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 限流处理
  *
  * @author swq
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class RateLimiterAspect {
     private static final Logger log = LoggerFactory.getLogger(RateLimiterAspect.class);
 

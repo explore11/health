@@ -1,15 +1,18 @@
 package com.hr.health.system.service.impl;
 
-import com.hr.health.common.annotation.DataScope;
+import com.hr.health.common.config.HealthConfig;
 import com.hr.health.common.constant.UserConstants;
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
+import com.hr.health.common.enums.ResultCode;
 import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.bean.BeanValidators;
-import com.hr.health.common.utils.spring.SpringUtils;
+import com.hr.health.common.utils.file.FileUploadUtils;
+import com.hr.health.common.utils.file.MimeTypeUtils;
 import com.hr.health.system.domain.SysPost;
 import com.hr.health.system.domain.SysUserPost;
 import com.hr.health.system.domain.SysUserRole;
@@ -18,14 +21,17 @@ import com.hr.health.system.service.ISysConfigService;
 import com.hr.health.system.service.ISysPostService;
 import com.hr.health.system.service.ISysRoleService;
 import com.hr.health.system.service.ISysUserService;
+import com.hr.health.system.utils.poi.ExcelUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Validator;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,13 +68,161 @@ public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     protected Validator validator;
 
-
     @Autowired
     private ISysRoleService roleService;
 
     @Autowired
     private ISysPostService postService;
 
+
+    /**
+     * 修改状态
+     * @param user
+     * @return
+     */
+    @Override
+    public Result changeStatus(SysUser user) {
+        this.checkUserAllowed(user);
+        user.setUpdateBy(SecurityUtils.getUsername());
+        return Result.judge(this.updateUserStatus(user));
+    }
+
+    /**
+     * 修改用户
+     * @param user
+     * @return
+     */
+    @Override
+    public Result edit(SysUser user) {
+        this.checkUserAllowed(user);
+        if (StringUtils.isNotEmpty(user.getPhonenumber()) && UserConstants.NOT_UNIQUE.equals(this.checkPhoneUnique(user))) {
+            return Result.failure(ResultCode.USER_PHONE_EXIST.code(), ResultCode.USER_PHONE_EXIST.message());
+        } else if (StringUtils.isNotEmpty(user.getEmail()) && UserConstants.NOT_UNIQUE.equals(this.checkEmailUnique(user))) {
+            return Result.failure(ResultCode.USER_EMAIL_EXIST.code(), ResultCode.USER_EMAIL_EXIST.message());
+        }
+        user.setUpdateBy(SecurityUtils.getUsername());
+        return Result.judge(this.updateUser(user));
+    }
+
+    /**
+     * 新增用户
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public Result add(SysUser user) {
+        if (UserConstants.NOT_UNIQUE.equals(this.checkUserNameUnique(user.getUserName()))) {
+            return Result.failure(ResultCode.USER_HAS_EXISTED.code(), ResultCode.USER_HAS_EXISTED.message());
+        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && UserConstants.NOT_UNIQUE.equals(this.checkPhoneUnique(user))) {
+            return Result.failure(ResultCode.USER_PHONE_EXIST.code(), ResultCode.USER_PHONE_EXIST.message());
+        } else if (StringUtils.isNotEmpty(user.getEmail()) && UserConstants.NOT_UNIQUE.equals(this.checkEmailUnique(user))) {
+            return Result.failure(ResultCode.USER_EMAIL_EXIST.code(), ResultCode.USER_EMAIL_EXIST.message());
+        }
+
+        //操作数据
+        user.setCreateBy(SecurityUtils.getUsername());
+        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        return Result.judge(this.insertUser(user));
+    }
+
+    /**
+     * 导入
+     *
+     * @param file
+     * @param updateSupport
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public Result importData(MultipartFile file, boolean updateSupport) throws Exception {
+        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+        List<SysUser> userList = util.importExcel(file.getInputStream());
+        String operationName = SecurityUtils.getUsername();
+        String message = this.importUser(userList, updateSupport, operationName);
+        return Result.success(message);
+    }
+
+    /**
+     * 头像上传
+     *
+     * @param file
+     * @return
+     */
+    @Override
+    public Result updateAvatar(MultipartFile file) throws Exception {
+        if (!file.isEmpty()) {
+            LoginUser loginUser = getLoginUser();
+            String avatar = FileUploadUtils.upload(HealthConfig.getAvatarPath(), file, MimeTypeUtils.IMAGE_EXTENSION);
+            if (this.updateUserAvatar(loginUser.getUsername(), avatar)) {
+                return Result.success(avatar);
+            }
+        }
+
+
+        return Result.failure();
+    }
+
+    /**
+     * 修改用户
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public Result updateProfile(SysUser user) {
+        LoginUser loginUser = getLoginUser();
+        SysUser sysUser = loginUser.getUser();
+        user.setUserName(sysUser.getUserName());
+        if (StringUtils.isNotEmpty(user.getPhonenumber()) && UserConstants.NOT_UNIQUE.equals(this.checkPhoneUnique(user))) {
+            return Result.failure(ResultCode.USER_PHONE_EXIST.code(), ResultCode.USER_PHONE_EXIST.message());
+        }
+        //修改用户
+        user.setUserId(sysUser.getUserId());
+        user.setPassword(null);
+        user.setAvatar(null);
+        user.setDeptId(null);
+        return Result.judge(this.updateUserProfile(user));
+    }
+
+    /**
+     * 获取岗位列表
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> profile() {
+        LoginUser loginUser = getLoginUser();
+        SysUser user = loginUser.getUser();
+        //数据返回
+        Map<String, Object> map = new HashMap<>();
+        map.put("roleGroup", this.selectUserRoleGroup(loginUser.getUsername()));
+        map.put("postGroup", this.selectUserPostGroup(loginUser.getUsername()));
+        map.put("user", user);
+
+        return map;
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    @Override
+    public Result updatePwd(String oldPassword, String newPassword) {
+        LoginUser loginUser = getLoginUser();
+        String userName = loginUser.getUsername();
+        String password = loginUser.getPassword();
+        if (!SecurityUtils.matchesPassword(oldPassword, password)) {
+            return Result.failure(ResultCode.USER_UPDATE_PASSWORD_FAILURE.code(), ResultCode.USER_UPDATE_PASSWORD_FAILURE.message());
+        }
+        if (SecurityUtils.matchesPassword(newPassword, password)) {
+            return Result.failure(ResultCode.USER_PASSWORD_NO_SAME.code(), ResultCode.USER_PASSWORD_NO_SAME.message());
+        }
+        return Result.judge(this.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)));
+    }
 
     /**
      * 用户授权角色
@@ -78,7 +232,6 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public void insertAuthRole(Long userId, Long[] roleIds) {
-        this.checkUserDataScope(userId);
         this.insertUserAuth(userId, roleIds);
     }
 
@@ -107,8 +260,6 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public Map<String, Object> getInfo(Long userId) {
         Map<String, Object> map = new HashMap<>();
-        this.checkUserDataScope(userId);
-
         //查询角色
         List<SysRole> roles = roleService.selectRoleAll();
         map.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
@@ -128,11 +279,9 @@ public class SysUserServiceImpl implements ISysUserService {
     public LoginUser getLoginUser() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         String username = loginUser.getUsername();
-
         //设置用户信息
         SysUser sysUser = this.selectUserByUserName(username);
         loginUser.setUser(sysUser);
-
         return loginUser;
     }
 
@@ -144,7 +293,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         return userMapper.selectUserList(user);
     }
@@ -156,7 +304,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user) {
         return userMapper.selectAllocatedList(user);
     }
@@ -168,7 +315,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user) {
         return userMapper.selectUnallocatedList(user);
     }
@@ -281,23 +427,6 @@ public class SysUserServiceImpl implements ISysUserService {
     public void checkUserAllowed(SysUser user) {
         if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
             throw new ServiceException("不允许操作超级管理员用户");
-        }
-    }
-
-    /**
-     * 校验用户是否有数据权限
-     *
-     * @param userId 用户id
-     */
-    @Override
-    public void checkUserDataScope(Long userId) {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
-            SysUser user = new SysUser();
-            user.setUserId(userId);
-            List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(user);
-            if (StringUtils.isEmpty(users)) {
-                throw new ServiceException("没有权限访问用户数据！");
-            }
         }
     }
 
@@ -497,7 +626,6 @@ public class SysUserServiceImpl implements ISysUserService {
     public int deleteUserByIds(Long[] userIds) {
         for (Long userId : userIds) {
             checkUserAllowed(new SysUser(userId));
-            checkUserDataScope(userId);
         }
         // 删除用户与角色关联
         userRoleMapper.deleteUserRole(userIds);

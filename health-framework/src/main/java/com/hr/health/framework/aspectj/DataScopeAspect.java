@@ -1,12 +1,5 @@
 package com.hr.health.framework.aspectj;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.springframework.stereotype.Component;
 import com.hr.health.common.annotation.DataScope;
 import com.hr.health.common.core.domain.BaseEntity;
 import com.hr.health.common.core.domain.entity.SysRole;
@@ -16,14 +9,19 @@ import com.hr.health.common.core.text.Convert;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.framework.security.context.PermissionContextHolder;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Before;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 数据过滤处理
  *
  * @author swq
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class DataScopeAspect {
     /**
      * 全部数据权限

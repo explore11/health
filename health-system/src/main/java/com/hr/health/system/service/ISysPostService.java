@@ -2,6 +2,7 @@ package com.hr.health.system.service;
 
 import java.util.List;
 
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.system.domain.SysPost;
 
 /**
@@ -96,4 +97,18 @@ public interface ISysPostService {
      * @return 结果
      */
     int updatePost(SysPost post);
+
+    /**
+     * 新增岗位
+     * @param post
+     * @return
+     */
+    Result add(SysPost post);
+
+    /**
+     * 修改岗位
+     * @param post
+     * @return
+     */
+    Result edit(SysPost post);
 }

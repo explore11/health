@@ -1,6 +1,7 @@
 package com.hr.health.system.service.impl;
 
 import com.hr.health.common.core.domain.entity.SysDictData;
+import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.system.mapper.SysDictDataMapper;
 import com.hr.health.system.service.ISysDictDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      */
     @Override
     public int updateDictData(SysDictData data) {
+        data.setUpdateBy(SecurityUtils.getUsername());
         return dictDataMapper.updateDictData(data);
     }
 }

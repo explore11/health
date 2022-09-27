@@ -33,7 +33,6 @@ public class SysDictTypeController extends BaseController {
     @Autowired
     private ISysDictTypeService dictTypeService;
 
-
     /**
      * 获取数据字典类型列表
      *
@@ -86,9 +85,7 @@ public class SysDictTypeController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
             return Result.failure(ResultCode.DATA_ALREADY_EXISTED.code(), ResultCode.DATA_ALREADY_EXISTED.message());
         }
-
         //新增数据操作
-        dict.setCreateBy(getUsername());
         return Result.judge(dictTypeService.insertDictType(dict));
     }
 
@@ -103,7 +100,6 @@ public class SysDictTypeController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
             return Result.failure(ResultCode.DATA_ALREADY_EXISTED.code(), ResultCode.DATA_ALREADY_EXISTED.message());
         }
-        dict.setUpdateBy(getUsername());
         return Result.judge(dictTypeService.updateDictType(dict));
     }
 

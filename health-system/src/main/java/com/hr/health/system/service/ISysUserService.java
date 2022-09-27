@@ -1,11 +1,14 @@
 package com.hr.health.system.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
+import com.hr.health.common.exception.file.InvalidExtensionException;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户 业务层
@@ -114,7 +117,7 @@ public interface ISysUserService {
      *
      * @param userId 用户id
      */
-    void checkUserDataScope(Long userId);
+//    void checkUserDataScope(Long userId);
 
     /**
      * 新增用户信息
@@ -240,4 +243,61 @@ public interface ISysUserService {
      */
     void insertAuthRole(Long userId, Long[] roleIds);
 
+    /**
+     * 重置密码
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    Result updatePwd(String oldPassword, String newPassword);
+
+    /**
+     * 获取岗位列表
+     * @return
+     */
+    Map<String, Object> profile();
+
+    /**
+     * 修改用户
+     * @param user
+     * @return
+     */
+    Result updateProfile(SysUser user);
+
+    /**
+     * 头像上传
+     * @param file
+     * @return
+     */
+    Result updateAvatar(MultipartFile file) throws Exception;
+
+    /**
+     * 导入
+     * @param file
+     * @param updateSupport
+     * @return
+     * @throws IOException
+     */
+    Result importData(MultipartFile file, boolean updateSupport) throws Exception;
+
+    /**
+     * 新增用户
+     * @param user
+     * @return
+     */
+    Result add(SysUser user);
+
+    /**
+     * 修改用户
+     * @param user
+     * @return
+     */
+    Result edit(SysUser user);
+
+    /**
+     * 修改状态
+     * @param user
+     * @return
+     */
+    Result changeStatus(SysUser user);
 }

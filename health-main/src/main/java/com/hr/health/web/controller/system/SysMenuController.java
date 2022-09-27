@@ -71,12 +71,7 @@ public class SysMenuController extends BaseController {
     @ApiOperation("加载对应角色菜单列表树")
     @GetMapping(value = "/roleMenuTreeSelect/{roleId}")
     public Result<Map<String, Object>> roleMenuTreeSelect(@PathVariable("roleId") Long roleId) {
-        // 查询数据
-        List<SysMenu> menus = menuService.selectMenuList(getUserId());
-        // 返回结果
-        Map<String, Object> map = new HashMap<>();
-        map.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
-        map.put("menus", menuService.buildMenuTreeSelect(menus));
+        Map<String, Object> map = menuService.roleMenuTreeSelect(roleId);
         return Result.success(map);
     }
 
@@ -88,14 +83,7 @@ public class SysMenuController extends BaseController {
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
     public Result add(@Validated @RequestBody SysMenu menu) {
-        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu))) {
-            return Result.failure(ResultCode.DATA_ALREADY_EXISTED.code(), ResultCode.DATA_ALREADY_EXISTED.message());
-        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
-            return Result.failure(ResultCode.PARAM_FORMAT_ERROR.code(), ResultCode.PARAM_FORMAT_ERROR.message());
-        }
-
-        menu.setCreateBy(getUsername());
-        return Result.judge(menuService.insertMenu(menu));
+        return menuService.add(menu);
     }
 
     /**
@@ -106,16 +94,7 @@ public class SysMenuController extends BaseController {
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public Result edit(@Validated @RequestBody SysMenu menu) {
-        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu))) {
-            return Result.failure(ResultCode.DATA_ALREADY_EXISTED.code(), ResultCode.DATA_ALREADY_EXISTED.message());
-        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
-            return Result.failure(ResultCode.PARAM_FORMAT_ERROR.code(), ResultCode.PARAM_FORMAT_ERROR.message());
-        } else if (menu.getMenuId().equals(menu.getParentId())) {
-            return Result.failure(ResultCode.DATA_PARENT_DEPT_NO_SELF.code(), ResultCode.DATA_PARENT_DEPT_NO_SELF.message());
-        }
-
-        menu.setUpdateBy(getUsername());
-        return Result.judge(menuService.updateMenu(menu));
+       return menuService.edit(menu);
     }
 
     /**
@@ -126,12 +105,6 @@ public class SysMenuController extends BaseController {
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
     public Result remove(@PathVariable("menuId") Long menuId) {
-        if (menuService.hasChildByMenuId(menuId)) {
-            return Result.failure(ResultCode.DATA_MENU_CONTAIN_SON_MENU_NO_DEL.code(), ResultCode.DATA_MENU_CONTAIN_SON_MENU_NO_DEL.message());
-        }
-        if (menuService.checkMenuExistRole(menuId)) {
-            return Result.failure(ResultCode.DATA_MENU_ALREADY_DISTRIBUTION.code(), ResultCode.DATA_MENU_ALREADY_DISTRIBUTION.message());
-        }
-        return Result.judge(menuService.deleteMenuById(menuId));
+       return menuService.remove(menuId);
     }
 }

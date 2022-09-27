@@ -1,18 +1,10 @@
 package com.hr.health.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.hr.health.common.annotation.DataScope;
 import com.hr.health.common.constant.UserConstants;
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
+import com.hr.health.common.enums.ResultCode;
 import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
@@ -25,6 +17,11 @@ import com.hr.health.system.mapper.SysRoleMapper;
 import com.hr.health.system.mapper.SysRoleMenuMapper;
 import com.hr.health.system.mapper.SysUserRoleMapper;
 import com.hr.health.system.service.ISysRoleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * 角色 业务层处理
@@ -45,6 +42,56 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Autowired
     private SysRoleDeptMapper roleDeptMapper;
 
+
+    /**
+     * 状态修改
+     * @param role
+     * @return
+     */
+    @Override
+    public Result changeStatus(SysRole role) {
+        this.checkRoleAllowed(role);
+        role.setUpdateBy(SecurityUtils.getUsername());
+        return Result.judge(this.updateRoleStatus(role));
+    }
+
+    /**
+     * 修改保存角色
+     *
+     * @param role
+     * @return
+     */
+    @Override
+    public Result edit(SysRole role) {
+        this.checkRoleAllowed(role);
+        if (UserConstants.NOT_UNIQUE.equals(this.checkRoleNameUnique(role))) {
+            return Result.failure(ResultCode.USER_ROLE_EXIST.code(), ResultCode.USER_ROLE_EXIST.message());
+        } else if (UserConstants.NOT_UNIQUE.equals(this.checkRoleKeyUnique(role))) {
+            return Result.failure(ResultCode.USER_ROLE_PERMISSIONS_EXIST.code(), ResultCode.USER_ROLE_PERMISSIONS_EXIST.message());
+        }
+
+        role.setUpdateBy(SecurityUtils.getUsername());
+        return Result.judge(this.updateRole(role));
+    }
+
+    /**
+     * 新增角色
+     *
+     * @param role
+     * @return
+     */
+    @Override
+    public Result add(SysRole role) {
+        if (UserConstants.NOT_UNIQUE.equals(this.checkRoleNameUnique(role))) {
+            return Result.failure(ResultCode.USER_ROLE_EXIST.code(), ResultCode.USER_ROLE_EXIST.message());
+        } else if (UserConstants.NOT_UNIQUE.equals(this.checkRoleKeyUnique(role))) {
+            return Result.failure(ResultCode.USER_ROLE_PERMISSIONS_EXIST.code(), ResultCode.USER_ROLE_PERMISSIONS_EXIST.message());
+        }
+
+        role.setCreateBy(SecurityUtils.getUsername());
+        return Result.judge(this.insertRole(role));
+    }
+
     /**
      * 根据条件分页查询角色数据
      *
@@ -52,7 +99,6 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * @return 角色数据集合信息
      */
     @Override
-    @DataScope(deptAlias = "d")
     public List<SysRole> selectRoleList(SysRole role) {
         return roleMapper.selectRoleList(role);
     }
@@ -172,22 +218,22 @@ public class SysRoleServiceImpl implements ISysRoleService {
         }
     }
 
-    /**
-     * 校验角色是否有数据权限
-     *
-     * @param roleId 角色id
-     */
-    @Override
-    public void checkRoleDataScope(Long roleId) {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
-            SysRole role = new SysRole();
-            role.setRoleId(roleId);
-            List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
-            if (StringUtils.isEmpty(roles)) {
-                throw new ServiceException("没有权限访问角色数据！");
-            }
-        }
-    }
+//    /**
+//     * 校验角色是否有数据权限
+//     *
+//     * @param roleId 角色id
+//     */
+//    @Override
+//    public void checkRoleDataScope(Long roleId) {
+//        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
+//            SysRole role = new SysRole();
+//            role.setRoleId(roleId);
+//            List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
+//            if (StringUtils.isEmpty(roles)) {
+//                throw new ServiceException("没有权限访问角色数据！");
+//            }
+//        }
+//    }
 
     /**
      * 通过角色ID查询角色使用数量
@@ -327,7 +373,6 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
             checkRoleAllowed(new SysRole(roleId));
-            checkRoleDataScope(roleId);
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));

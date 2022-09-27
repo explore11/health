@@ -3,10 +3,8 @@ package com.hr.health.web.controller.system;
 import com.hr.health.common.annotation.Log;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.controller.BaseController;
-import com.hr.health.common.core.domain.AjaxResult;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysDept;
-import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.page.TableDataInfo;
 import com.hr.health.common.enums.BusinessType;
@@ -26,10 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 用户信息
@@ -87,11 +83,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:import')")
     @PostMapping("/importData")
     public Result importData(MultipartFile file, boolean updateSupport) throws Exception {
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-        List<SysUser> userList = util.importExcel(file.getInputStream());
-        String operationName = getUsername();
-        String message = userService.importUser(userList, updateSupport, operationName);
-        return Result.success(message);
+        return userService.importData(file, updateSupport);
     }
 
     /**
@@ -125,18 +117,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
     public Result add(@Validated @RequestBody SysUser user) {
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
-            return Result.failure(ResultCode.USER_HAS_EXISTED.code(), ResultCode.USER_HAS_EXISTED.message());
-        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-            return Result.failure(ResultCode.USER_PHONE_EXIST.code(), ResultCode.USER_PHONE_EXIST.message());
-        } else if (StringUtils.isNotEmpty(user.getEmail()) && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
-            return Result.failure(ResultCode.USER_EMAIL_EXIST.code(), ResultCode.USER_EMAIL_EXIST.message());
-        }
-
-        //操作数据
-        user.setCreateBy(getUsername());
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return Result.judge(userService.insertUser(user));
+        return userService.add(user);
     }
 
     /**
@@ -147,15 +128,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public Result edit(@Validated @RequestBody SysUser user) {
-        userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
-        if (StringUtils.isNotEmpty(user.getPhonenumber()) && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-            return Result.failure(ResultCode.USER_PHONE_EXIST.code(), ResultCode.USER_PHONE_EXIST.message());
-        } else if (StringUtils.isNotEmpty(user.getEmail()) && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
-            return Result.failure(ResultCode.USER_EMAIL_EXIST.code(), ResultCode.USER_EMAIL_EXIST.message());
-        }
-        user.setUpdateBy(getUsername());
-        return Result.judge(userService.updateUser(user));
+        return userService.edit(user);
     }
 
     /**
@@ -181,7 +154,6 @@ public class SysUserController extends BaseController {
     @PutMapping("/resetPwd")
     public Result resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         user.setUpdateBy(getUsername());
         return Result.judge(userService.resetPwd(user));
@@ -195,10 +167,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public Result changeStatus(@RequestBody SysUser user) {
-        userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
-        user.setUpdateBy(getUsername());
-        return Result.judge(userService.updateUserStatus(user));
+        return userService.changeStatus(user);
     }
 
     /**
