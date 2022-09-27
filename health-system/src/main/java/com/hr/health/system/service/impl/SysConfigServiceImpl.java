@@ -3,7 +3,8 @@ package com.hr.health.system.service.impl;
 import com.hr.health.common.annotation.DataSource;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.enums.DataSourceType;
-import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.system.domain.SysConfig;
 import com.hr.health.system.mapper.SysConfigMapper;
@@ -98,11 +99,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
         for (Long configId : configIds) {
             SysConfig config = selectConfigById(configId);
             if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
-                throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
+                throw new MicroServiceException(ResultCode.SPECIFIED_INNER_PARAM_NO_DELETE.code(), ResultCode.SPECIFIED_INNER_PARAM_NO_DELETE.message());
             }
             configMapper.deleteConfigById(configId);
         }
     }
+
     /**
      * 校验参数键名是否唯一
      *

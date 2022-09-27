@@ -3,8 +3,8 @@ package com.hr.health.system.service.impl;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysRole;
-import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
@@ -214,26 +214,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public void checkRoleAllowed(SysRole role) {
         if (StringUtils.isNotNull(role.getRoleId()) && role.isAdmin()) {
-            throw new ServiceException("不允许操作超级管理员角色");
+            throw new MicroServiceException(ResultCode.USER_NO_ALLOW_USE_SUPER_ADMIN.code(),ResultCode.USER_NO_ALLOW_USE_SUPER_ADMIN.message());
         }
     }
-
-//    /**
-//     * 校验角色是否有数据权限
-//     *
-//     * @param roleId 角色id
-//     */
-//    @Override
-//    public void checkRoleDataScope(Long roleId) {
-//        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
-//            SysRole role = new SysRole();
-//            role.setRoleId(roleId);
-//            List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
-//            if (StringUtils.isEmpty(roles)) {
-//                throw new ServiceException("没有权限访问角色数据！");
-//            }
-//        }
-//    }
 
     /**
      * 通过角色ID查询角色使用数量

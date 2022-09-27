@@ -5,10 +5,9 @@ import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.TreeSelect;
 import com.hr.health.common.core.domain.entity.SysDept;
 import com.hr.health.common.core.domain.entity.SysRole;
-import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.text.Convert;
 import com.hr.health.common.enums.ResultCode;
-import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.spring.SpringUtils;
@@ -37,6 +36,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
 
     /**
      * 获取对应角色部门树列表
+     *
      * @param roleId
      * @return
      */
@@ -239,23 +239,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
     }
 
     /**
-     * 校验部门是否有数据权限
-     *
-     * @param deptId 部门id
-     */
-    @Override
-    public void checkDeptDataScope(Long deptId) {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
-            SysDept dept = new SysDept();
-            dept.setDeptId(deptId);
-            List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
-            if (StringUtils.isEmpty(depts)) {
-                throw new ServiceException("没有权限访问部门数据！");
-            }
-        }
-    }
-
-    /**
      * 新增保存部门信息
      *
      * @param dept 部门信息
@@ -267,7 +250,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         SysDept info = deptMapper.selectDeptById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
-            throw new ServiceException("部门停用，不允许新增");
+            throw new MicroServiceException(ResultCode.DATA_POST_STOP_NO_ALLOW_ADD.code(), ResultCode.DATA_POST_STOP_NO_ALLOW_ADD.message());
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
         return deptMapper.insertDept(dept);
@@ -290,8 +273,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
         }
         int result = deptMapper.updateDept(dept);
-        if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
-                && !StringUtils.equals("0", dept.getAncestors())) {
+        if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors()) && !StringUtils.equals("0", dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }

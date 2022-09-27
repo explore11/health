@@ -38,10 +38,13 @@ public enum ResultCode {
     USER_ROLE_EXIST(216, "用户角色已存在"),
     USER_EMAIL_EXIST(217, "用户邮箱已存在"),
     USER_NO_DELETE(218, "当前用户不能删除"),
+    USER_NO_ALLOW_USE_SUPER_ADMIN(219, "不允许操作超级管理员角色"),
 
     /* 业务错误：301-399 */
     SPECIFIED_UPLOAD_FILE_FAILURE(301, "文件上传失败"),
     SPECIFIED_FILE_DOWNLOAD_FAILURE(302, "文件下载失败"),
+    SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD(303, "资源文件非法，不允许下载"),
+    SPECIFIED_INNER_PARAM_NO_DELETE(304, "内置参数，不允许删除"),
 
     /* 数据错误：401-499 */
     RESULT_DATA_NONE(401, "数据未找到"),
@@ -55,6 +58,8 @@ public enum ResultCode {
     DATA_MENU_ALREADY_DISTRIBUTION(410, "菜单已分配,不允许删除"),
     DATA_POST_NAME_ALREADY_EXISTED(411, "岗位名称已存在"),
     DATA_POST_NUMBER_ALREADY_EXISTED(412, "岗位编码已存在"),
+    DATA_POST_STOP_NO_ALLOW_ADD(413, "部门停用，不允许新增"),
+    DATA_POST_ALREADY_DISTRIBUTION(414, "岗位已分配,不允许删除"),
 
     /* 系统错误：501-599 */
     SYSTEM_INNER_ERROR(501, "系统内部出错，请稍后重试"),

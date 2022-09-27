@@ -4,6 +4,7 @@ import com.hr.health.common.config.HealthConfig;
 import com.hr.health.common.constant.Constants;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.file.FileUploadUtils;
 import com.hr.health.common.utils.file.FileUtils;
@@ -43,7 +44,7 @@ public class CommonServiceImpl implements CommonService {
     public void resourceDownload(String resource, HttpServletRequest request, HttpServletResponse response) {
         try {
             if (!FileUtils.checkAllowDownload(resource)) {
-                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
+                throw new MicroServiceException(ResultCode.SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD.code(), ResultCode.SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD.message());
             }
             // 本地资源路径
             String localPath = HealthConfig.getProfile();
@@ -56,6 +57,8 @@ public class CommonServiceImpl implements CommonService {
             FileUtils.writeBytes(downloadPath, response.getOutputStream());
         } catch (Exception e) {
             log.error("下载文件失败", e);
+            e.printStackTrace();
+            throw new MicroServiceException(ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.code(), ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.message());
         }
     }
 
@@ -91,6 +94,8 @@ public class CommonServiceImpl implements CommonService {
             map.put("originalFilenames", StringUtils.join(originalFilenames, FILE_SEPARATOR));
             return Result.success(map);
         } catch (Exception e) {
+            log.error("文件上传失败", e);
+            e.printStackTrace();
             return Result.failure(ResultCode.SPECIFIED_UPLOAD_FILE_FAILURE.code(), ResultCode.SPECIFIED_UPLOAD_FILE_FAILURE.message());
         }
     }
@@ -118,6 +123,8 @@ public class CommonServiceImpl implements CommonService {
 
             return Result.success(map);
         } catch (Exception e) {
+            log.error("文件上传失败", e);
+            e.printStackTrace();
             return Result.failure(ResultCode.SPECIFIED_UPLOAD_FILE_FAILURE.code(), ResultCode.SPECIFIED_UPLOAD_FILE_FAILURE.message());
         }
     }
@@ -134,7 +141,7 @@ public class CommonServiceImpl implements CommonService {
     public void fileDownload(String fileName, Boolean delete, HttpServletRequest request, HttpServletResponse response) {
         try {
             if (!FileUtils.checkAllowDownload(fileName)) {
-                throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
+                throw new MicroServiceException(ResultCode.SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD.code(), ResultCode.SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD.message());
             }
             String realFileName = System.currentTimeMillis() + fileName.substring(fileName.indexOf("_") + 1);
             String filePath = HealthConfig.getDownloadPath() + fileName;
@@ -147,6 +154,8 @@ public class CommonServiceImpl implements CommonService {
             }
         } catch (Exception e) {
             log.error("下载文件失败", e);
+            e.printStackTrace();
+            throw new MicroServiceException(ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.code(), ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.message());
         }
     }
 }

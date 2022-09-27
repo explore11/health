@@ -1,19 +1,19 @@
 package com.hr.health.system.service.impl;
 
-import java.util.List;
-
+import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.utils.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.hr.health.common.constant.UserConstants;
-import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.system.domain.SysPost;
 import com.hr.health.system.mapper.SysPostMapper;
 import com.hr.health.system.mapper.SysUserPostMapper;
 import com.hr.health.system.service.ISysPostService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 岗位信息 服务层处理
@@ -31,6 +31,7 @@ public class SysPostServiceImpl implements ISysPostService {
 
     /**
      * 修改岗位
+     *
      * @param post
      * @return
      */
@@ -48,6 +49,7 @@ public class SysPostServiceImpl implements ISysPostService {
 
     /**
      * 新增岗位
+     *
      * @param post
      * @return
      */
@@ -169,9 +171,8 @@ public class SysPostServiceImpl implements ISysPostService {
     @Override
     public int deletePostByIds(Long[] postIds) {
         for (Long postId : postIds) {
-            SysPost post = selectPostById(postId);
             if (countUserPostById(postId) > 0) {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", post.getPostName()));
+                throw new MicroServiceException(ResultCode.DATA_POST_ALREADY_DISTRIBUTION.code(), ResultCode.DATA_POST_ALREADY_DISTRIBUTION.message());
             }
         }
         return postMapper.deletePostByIds(postIds);

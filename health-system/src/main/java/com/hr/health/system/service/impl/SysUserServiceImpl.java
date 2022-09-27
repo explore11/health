@@ -7,6 +7,7 @@ import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
 import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
@@ -77,6 +78,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     /**
      * 修改状态
+     *
      * @param user
      * @return
      */
@@ -89,6 +91,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     /**
      * 修改用户
+     *
      * @param user
      * @return
      */
@@ -426,7 +429,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public void checkUserAllowed(SysUser user) {
         if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
-            throw new ServiceException("不允许操作超级管理员用户");
+            throw new MicroServiceException(ResultCode.USER_NO_ALLOW_USE_SUPER_ADMIN.code(), ResultCode.USER_NO_ALLOW_USE_SUPER_ADMIN.message());
         }
     }
 
@@ -645,7 +648,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName) {
         if (StringUtils.isNull(userList) || userList.size() == 0) {
-            throw new ServiceException("导入用户数据不能为空！");
+            throw new MicroServiceException(ResultCode.DATA_IS_WRONG.code(),ResultCode.DATA_IS_WRONG.message());
         }
         int successNum = 0;
         int failureNum = 0;
