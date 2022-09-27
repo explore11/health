@@ -8,7 +8,6 @@ import com.hr.health.common.utils.ServletUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.ip.AddressUtils;
 import com.hr.health.common.utils.ip.IpUtils;
-import com.hr.health.system.service.ISysUserService;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,7 +16,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,17 +48,6 @@ public class TokenService {
 
     protected static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
 
-    private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
-
-//    @Autowired
-//    private RedisCache redisCache;
-
-    @Resource
-    private ISysUserService iSysUserService;
-
-    @Resource
-    private SysPermissionService sysPermissionService;
-
     /**
      * 获取用户身份信息
      *
@@ -69,16 +56,10 @@ public class TokenService {
     public Claims getClaims(HttpServletRequest request) {
         // 获取请求携带的令牌
         String token = getToken(request);
-        System.out.println("token"+token);
         if (StringUtils.isNotEmpty(token)) {
             try {
-
-
                 Claims claims = parseToken(token);
                 // 解析对应的权限以及用户信息
-//                String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
-//                String userKey = getTokenKey(uuid);
-//                LoginUser user = redisCache.getCacheObject(userKey);
                 return claims;
             } catch (ExpiredJwtException e) {
                 //
@@ -88,24 +69,6 @@ public class TokenService {
         return null;
     }
 
-//    /**
-//     * 设置用户身份信息
-//     */
-//    public void setLoginUser(LoginUser loginUser) {
-//        if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
-//            refreshToken(loginUser);
-//        }
-//    }
-
-//    /**
-//     * 删除用户身份信息
-//     */
-//    public void delLoginUser(String token) {
-//        if (StringUtils.isNotEmpty(token)) {
-//            String userKey = getTokenKey(token);
-//            redisCache.deleteObject(userKey);
-//        }
-//    }
 
     /**
      * 创建令牌
@@ -122,42 +85,8 @@ public class TokenService {
         long refresh = System.currentTimeMillis() + refreshTime * MILLIS_MINUTE;
         claims.put(Constants.REFRESH_TOKEN_TIME, refresh);
 
-//        //根据用户名查询用户信息
-//        SysUser sysUser = iSysUserService.selectUserByUserName(username);
-//        //根据用户查询权限信息
-//        Set<String> permissions = sysPermissionService.getPermissionsByRole(sysUser);
-//        //设置权限信息
-//        claims.put(Constants.PERMISSION, JSON.toJSONString(permissions));
-
         return createToken(claims);
     }
-
-//    /**
-//     * 验证令牌有效期，相差不足20分钟，自动刷新缓存
-//     *
-//     * @param loginUser
-//     * @return 令牌
-//     */
-//    public void verifyToken(LoginUser loginUser) {
-//        long expireTime = loginUser.getExpireTime();
-//        long currentTime = System.currentTimeMillis();
-//        if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
-//            refreshToken(loginUser);
-//        }
-//    }
-
-//    /**
-//     * 刷新令牌有效期
-//     *
-//     * @param loginUser 登录信息
-//     */
-//    public void refreshToken(LoginUser loginUser) {
-//        loginUser.setLoginTime(System.currentTimeMillis());
-//        loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
-//        // 根据uuid将loginUser缓存
-//        String userKey = getTokenKey(loginUser.getToken());
-//        redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
-//    }
 
     /**
      * 设置用户代理信息

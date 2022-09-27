@@ -1,21 +1,10 @@
 package com.hr.health.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Validator;
-
-import com.hr.health.common.core.domain.model.LoginUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import com.hr.health.common.annotation.DataScope;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.core.domain.entity.SysUser;
+import com.hr.health.common.core.domain.model.LoginUser;
 import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
@@ -24,13 +13,24 @@ import com.hr.health.common.utils.spring.SpringUtils;
 import com.hr.health.system.domain.SysPost;
 import com.hr.health.system.domain.SysUserPost;
 import com.hr.health.system.domain.SysUserRole;
-import com.hr.health.system.mapper.SysPostMapper;
-import com.hr.health.system.mapper.SysRoleMapper;
-import com.hr.health.system.mapper.SysUserMapper;
-import com.hr.health.system.mapper.SysUserPostMapper;
-import com.hr.health.system.mapper.SysUserRoleMapper;
+import com.hr.health.system.mapper.*;
 import com.hr.health.system.service.ISysConfigService;
+import com.hr.health.system.service.ISysPostService;
+import com.hr.health.system.service.ISysRoleService;
 import com.hr.health.system.service.ISysUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -62,6 +62,65 @@ public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     protected Validator validator;
 
+
+    @Autowired
+    private ISysRoleService roleService;
+
+    @Autowired
+    private ISysPostService postService;
+
+
+    /**
+     * 用户授权角色
+     *
+     * @param userId
+     * @param roleIds
+     */
+    @Override
+    public void insertAuthRole(Long userId, Long[] roleIds) {
+        this.checkUserDataScope(userId);
+        this.insertUserAuth(userId, roleIds);
+    }
+
+    /**
+     * 根据用户编号获取授权角色
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public Map<String, Object> authRole(Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        SysUser user = this.selectUserById(userId);
+        List<SysRole> roles = roleService.selectRolesByUserId(userId);
+        map.put("user", user);
+        map.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
+        return map;
+    }
+
+    /**
+     * 根据用户编号获取详细信息
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getInfo(Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        this.checkUserDataScope(userId);
+
+        //查询角色
+        List<SysRole> roles = roleService.selectRoleAll();
+        map.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
+        map.put("posts", postService.selectPostAll());
+        // 查询用户
+        SysUser sysUser = this.selectUserById(userId);
+        map.put("user", sysUser);
+        map.put("postIds", postService.selectPostListByUserId(userId));
+        map.put("roleIds", sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
+
+        return map;
+    }
 
     /**
      * 获取用户信息

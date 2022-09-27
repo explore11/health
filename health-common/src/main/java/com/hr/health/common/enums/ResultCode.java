@@ -35,7 +35,9 @@ public enum ResultCode {
     USER_UPDATE_PASSWORD_FAILURE(213, "修改密码失败，旧密码错误"),
     USER_PASSWORD_NO_SAME(214, "新密码不能与旧密码相同"),
     USER_ROLE_PERMISSIONS_EXIST(215, "用户权限已存在"),
-    USER_ROLE_EXIST(215, "用户角色已存在"),
+    USER_ROLE_EXIST(216, "用户角色已存在"),
+    USER_EMAIL_EXIST(217, "用户邮箱已存在"),
+    USER_NO_DELETE(218, "当前用户不能删除"),
 
     /* 业务错误：301-399 */
     SPECIFIED_QUESTIONED_USER_NOT_EXIST(301, "某业务出现问题"),

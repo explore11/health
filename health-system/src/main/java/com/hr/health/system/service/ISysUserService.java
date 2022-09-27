@@ -1,7 +1,9 @@
 package com.hr.health.system.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
 
@@ -212,4 +214,26 @@ public interface ISysUserService {
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 根据用户编号获取详细信息
+     * @param userId
+     * @return
+     */
+    Map<String, Object> getInfo(Long userId);
+
+    /**
+     * 根据用户编号获取授权角色
+     * @param userId
+     * @return
+     */
+    Map<String, Object> authRole(Long userId);
+
+    /**
+     * 用户授权角色
+     * @param userId
+     * @param roleIds
+     */
+    void insertAuthRole(Long userId, Long[] roleIds);
+
 }

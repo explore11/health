@@ -1,10 +1,8 @@
 package com.hr.health.web.controller.system;
 
-import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
 import com.hr.health.common.annotation.Log;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.controller.BaseController;
-import com.hr.health.common.core.domain.AjaxResult;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysDept;
 import com.hr.health.common.core.domain.entity.SysRole;
@@ -12,8 +10,6 @@ import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.page.TableDataInfo;
 import com.hr.health.common.enums.BusinessType;
 import com.hr.health.common.enums.ResultCode;
-import com.hr.health.framework.web.service.SysPermissionService;
-import com.hr.health.framework.web.service.TokenService;
 import com.hr.health.system.domain.SysUserRole;
 import com.hr.health.system.service.ISysDeptService;
 import com.hr.health.system.service.ISysRoleService;

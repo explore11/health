@@ -54,7 +54,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                     if (!isRefreshExpiration) {
                         //生成新的token
                         String refreshToken = tokenService.createToken(loginUser);
-                        System.out.println(refreshToken);
                         //设置header
                         response.setHeader(HttpHeaders.AUTHORIZATION, Constants.TOKEN_PREFIX + refreshToken);
                     } else {
