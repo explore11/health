@@ -40,7 +40,8 @@ public enum ResultCode {
     USER_NO_DELETE(218, "当前用户不能删除"),
 
     /* 业务错误：301-399 */
-    SPECIFIED_QUESTIONED_USER_NOT_EXIST(301, "某业务出现问题"),
+    SPECIFIED_UPLOAD_FILE_FAILURE(301, "文件上传失败"),
+    SPECIFIED_FILE_DOWNLOAD_FAILURE(302, "文件下载失败"),
 
     /* 数据错误：401-499 */
     RESULT_DATA_NONE(401, "数据未找到"),

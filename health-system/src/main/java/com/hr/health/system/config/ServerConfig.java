@@ -1,9 +1,9 @@
-package com.hr.health.framework.config;
+package com.hr.health.system.config;
+
+import com.hr.health.common.utils.ServletUtils;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.stereotype.Component;
-import com.hr.health.common.utils.ServletUtils;
 
 /**
  * 服务相关配置
