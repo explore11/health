@@ -91,26 +91,26 @@ public class FileUploadUtils {
     public static final String upload(String baseDir, MultipartFile file, String[] allowedExtension)
             throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException,
             InvalidExtensionException {
-        int fileNamelength = Objects.requireNonNull(file.getOriginalFilename()).length();
-        if (fileNamelength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
+        int fileNameLength = Objects.requireNonNull(file.getOriginalFilename()).length();
+        if (fileNameLength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
             throw new FileNameLengthLimitExceededException(FileUploadUtils.DEFAULT_FILE_NAME_LENGTH);
         }
 
+        //文件大小校验
         assertAllowed(file, allowedExtension);
-
         String fileName = extractFilename(file);
 
         String absPath = getAbsoluteFile(baseDir, fileName).getAbsolutePath();
         file.transferTo(Paths.get(absPath));
-        return getPathFileName(baseDir, fileName);
+        String pathFileName = getPathFileName(baseDir, fileName);
+        return pathFileName;
     }
 
     /**
      * 编码文件名
      */
     public static final String extractFilename(MultipartFile file) {
-        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(),
-                FilenameUtils.getBaseName(file.getOriginalFilename()), Seq.getId(Seq.uploadSeqType), getExtension(file));
+        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(),FilenameUtils.getBaseName(file.getOriginalFilename()), Seq.getId(Seq.uploadSeqType), getExtension(file));
     }
 
     public static final File getAbsoluteFile(String uploadDir, String fileName) throws IOException {

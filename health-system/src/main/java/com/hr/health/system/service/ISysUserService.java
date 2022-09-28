@@ -315,4 +315,9 @@ public interface ISysUserService {
     Result parseQrCode();
 
 
+    /**
+     * 生成压缩包
+     * @return
+     */
+    Result generateCompressedPackage();
 }

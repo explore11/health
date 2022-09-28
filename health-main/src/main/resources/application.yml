@@ -9,11 +9,19 @@ health:
   # 实例演示开关
   demoEnabled: true
   # 文件路径 示例（ Windows配置D:/heath/uploadPath，Linux配置 /home/heath/uploadPath）
-  profile: D:/Health/uploadPath
+  profile: D:/health/uploadPath
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
   captchaType: math
+
+# 上传的相关配置
+upload:
+  #上传文件大小
+  maxSize: 50
+  #文件名称长度
+  fileNameLength: 100
+
 
 # 开发环境配置
 server:

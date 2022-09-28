@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class Student implements Serializable {
 
 
-    @TableId(value = "id",type = IdType.ID_WORKER)
+    @TableId(value = "id")
     private Long id;
 
     @TableField("card")

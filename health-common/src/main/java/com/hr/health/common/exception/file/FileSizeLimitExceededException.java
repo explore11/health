@@ -11,4 +11,8 @@ public class FileSizeLimitExceededException extends FileException {
     public FileSizeLimitExceededException(long defaultMaxSize) {
         super("upload.exceed.maxSize", new Object[]{defaultMaxSize});
     }
+
+    public FileSizeLimitExceededException(long defaultMaxSize, String unit) {
+        super("upload.exceed.maxSize", new Object[]{defaultMaxSize + unit});
+    }
 }

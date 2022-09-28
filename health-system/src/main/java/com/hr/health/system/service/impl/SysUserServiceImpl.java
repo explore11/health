@@ -1,6 +1,7 @@
 package com.hr.health.system.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ZipUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.hr.health.common.config.HealthConfig;
 import com.hr.health.common.constant.UserConstants;
@@ -34,6 +35,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Validator;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +81,20 @@ public class SysUserServiceImpl implements ISysUserService {
 
 
     /**
+     * 生成压缩包
+     *
+     * @return
+     */
+    @Override
+    public Result generateCompressedPackage() {
+        File zip = ZipUtil.zip("D:\\place");
+        System.out.println(zip.getPath());
+        return Result.success(zip.getPath());
+    }
+
+    /**
      * 解析二维码
+     *
      * @return
      */
     @Override
@@ -90,6 +105,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     /**
      * 生成二维码
+     *
      * @param user
      * @return
      */
@@ -671,7 +687,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName) {
         if (StringUtils.isNull(userList) || userList.size() == 0) {
-            throw new MicroServiceException(ResultCode.DATA_IS_WRONG.code(),ResultCode.DATA_IS_WRONG.message());
+            throw new MicroServiceException(ResultCode.DATA_IS_WRONG.code(), ResultCode.DATA_IS_WRONG.message());
         }
         int successNum = 0;
         int failureNum = 0;

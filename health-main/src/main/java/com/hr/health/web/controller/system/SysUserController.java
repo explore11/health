@@ -44,6 +44,16 @@ public class SysUserController extends BaseController {
 
 
     /**
+     * 生成压缩包
+     */
+    @ApiOperation("生成压缩包")
+    @PreAuthorize("@ss.hasPermi('system:user:generateCompressedPackage')")
+    @GetMapping("/generateCompressedPackage")
+    public Result generateCompressedPackage() {
+        return userService.generateCompressedPackage();
+    }
+
+    /**
      * 解析二维码
      */
     @ApiOperation("解析二维码")
