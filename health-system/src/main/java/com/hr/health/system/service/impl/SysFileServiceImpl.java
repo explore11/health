@@ -14,6 +14,7 @@ import com.hr.health.common.exception.file.FileNameLengthLimitExceededException;
 import com.hr.health.common.exception.file.FileSizeLimitExceededException;
 import com.hr.health.common.exception.file.InvalidExtensionException;
 import com.hr.health.common.utils.*;
+import com.hr.health.common.utils.file.FileUtils;
 import com.hr.health.common.utils.file.MimeTypeUtils;
 import com.hr.health.common.utils.uuid.Seq;
 import com.hr.health.system.config.ServerConfig;
@@ -24,6 +25,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,6 +56,39 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileInfo> 
     @Value("${upload.fileNameLength}")
     private Integer fileNameLength;
 
+
+
+    /**
+     * 本地资源通用下载
+     *
+     * @param resource
+     * @param request
+     * @param response
+     */
+    @Override
+    public void resourceDownload(String resource, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            if (!FileUtils.checkAllowDownload(resource)) {
+                throw new MicroServiceException(ResultCode.SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD.code(), ResultCode.SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD.message());
+            }
+            // 本地资源路径
+            String localPath = HealthConfig.getProfile();
+            // 数据库资源地址
+            String downloadPath = localPath + StringUtils.substringAfter(resource, Constants.RESOURCE_PREFIX);
+            // 下载名称
+            String downloadName = StringUtils.substringAfterLast(downloadPath, "/");
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            FileUtils.setAttachmentResponseHeader(response, downloadName);
+            FileUtils.writeBytes(downloadPath, response.getOutputStream());
+        } catch (Exception e) {
+            log.error("下载文件失败", e);
+            e.printStackTrace();
+            throw new MicroServiceException(ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.code(), ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.message());
+        }
+    }
+
+
+
     /**
      * 获取新的文件名
      *
@@ -62,12 +97,6 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileInfo> 
      */
     private static String getNewFileName(String fileName) {
         return fileName.substring(fileName.lastIndexOf("/") + 1);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(File.separator);
-        String newFileName = getNewFileName("/profile/upload/2022/09/28/美团打车行程单_20220928151413A006.pdf");
-        System.out.println(newFileName);
     }
 
     /**
@@ -87,18 +116,6 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileInfo> 
             }
         }
         return desc;
-    }
-
-    /**
-     * 本地资源通用下载
-     *
-     * @param resource
-     * @param request
-     * @param response
-     */
-    @Override
-    public void resourceDownload(String resource, HttpServletRequest request, HttpServletResponse response) {
-
     }
 
     /**
