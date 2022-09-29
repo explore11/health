@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -76,6 +77,27 @@ public class TestStudentController {
     }
 
 
+    /**
+     * 下载压缩导入模板
+     *
+     * @param response
+     */
+    @ApiOperation("下载压缩导入模板")
+    @GetMapping("/compressImportTemplate")
+    public void compressImportTemplate(HttpServletResponse response) {
+        testStudentService.compressImportTemplate(response);
+    }
+
+    /**
+     * 解析压缩包导入数据
+     *
+     * @param file
+     */
+    @ApiOperation("解析压缩包导入数据")
+    @GetMapping("/parseCompressImportData")
+    public void parseCompressImportData(MultipartFile file) {
+        testStudentService.parseCompressImportData(file);
+    }
 
 
 }

@@ -9,6 +9,7 @@ import com.hr.health.business.service.TestStudentService;
 import com.hr.health.common.utils.CompressUtil;
 import com.hr.health.system.utils.poi.ExcelUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +22,38 @@ public class TestStudentServiceImpl implements TestStudentService {
     @Resource
     private TestStudentMapper testStudentMapper;
 
+
+    /**
+     * 解析压缩包导入数据
+     * @param file
+     */
+    @Override
+    public void parseCompressImportData(MultipartFile file) {
+
+    }
+
+    /**
+     * 下载压缩导入模板
+     * @param response
+     */
+    @Override
+    public void compressImportTemplate(HttpServletResponse response) {
+        ExcelUtil<Student> util = new ExcelUtil<>(Student.class);
+        //生成本地的excel文件，返回绝对路径
+        String excelPath = util.createExcelToLocal(null, "学生数据导入模板");
+
+        //组装压缩路径
+        String path = excelPath.substring(0, excelPath.lastIndexOf("/") + 1);
+        String zipPath = path + "导入模板压缩包.zip";
+
+        //进行文件压缩
+        File zipFile = ZipUtil.zip(excelPath,zipPath);
+        CompressUtil.downloadZip(response, zipFile.getName(), zipFile);
+
+        //删除数据
+        FileUtil.del(excelPath);
+        FileUtil.del(zipPath);
+    }
 
     /**
      * 多文件压缩导出
