@@ -13,7 +13,9 @@ import com.hr.health.common.utils.file.FileUtils;
 import com.hr.health.common.utils.file.ImageUtils;
 import com.hr.health.common.utils.poi.ExcelHandlerAdapter;
 import com.hr.health.common.utils.reflect.ReflectUtils;
+import com.hr.health.common.utils.uuid.Seq;
 import com.hr.health.system.utils.dict.DictUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -28,6 +30,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -208,7 +211,7 @@ public class ExcelUtil<T> {
      * @return 字典标签
      */
     public static String convertDictByExp(String dictValue, String dictType, String separator) {
-        DictUtils dictUtils =new DictUtils();
+        DictUtils dictUtils = new DictUtils();
         return dictUtils.getDictLabel(dictType, dictValue, separator);
     }
 
@@ -221,7 +224,7 @@ public class ExcelUtil<T> {
      * @return 字典值
      */
     public static String reverseDictByExp(String dictLabel, String dictType, String separator) {
-        DictUtils dictUtils =new DictUtils();
+        DictUtils dictUtils = new DictUtils();
         return dictUtils.getDictValue(dictType, dictLabel, separator);
     }
 
@@ -513,6 +516,17 @@ public class ExcelUtil<T> {
      *
      * @param list      导出数据集合
      * @param sheetName 工作表的名称
+     * @return 结果
+     */
+    public String createExcelToLocal(List<T> list, String sheetName) {
+        return createExcelToLocal(list, sheetName, StringUtils.EMPTY);
+    }
+
+    /**
+     * 对list数据源将其里面的数据导入到excel表单
+     *
+     * @param list      导出数据集合
+     * @param sheetName 工作表的名称
      * @param title     标题
      * @return 结果
      */
@@ -520,6 +534,20 @@ public class ExcelUtil<T> {
         this.init(list, sheetName, title, Excel.Type.EXPORT);
         return exportExcel();
     }
+
+    /**
+     * 对list数据源将其里面的数据导入到excel表单
+     *
+     * @param list      导出数据集合
+     * @param sheetName 工作表的名称
+     * @param title     标题
+     * @return 结果
+     */
+    public String createExcelToLocal(List<T> list, String sheetName, String title) {
+        this.init(list, sheetName, title, Excel.Type.EXPORT);
+        return createExcel();
+    }
+
 
     /**
      * 对list数据源将其里面的数据导入到excel表单
@@ -624,6 +652,31 @@ public class ExcelUtil<T> {
             out = new FileOutputStream(getAbsoluteFile(filename));
             wb.write(out);
             return AjaxResult.success(filename);
+        } catch (Exception e) {
+            log.error("导出Excel异常{}", e.getMessage());
+            throw new UtilException("导出Excel失败，请联系网站管理员！");
+        } finally {
+            IOUtils.closeQuietly(wb);
+            IOUtils.closeQuietly(out);
+        }
+    }
+
+    /**
+     * 对list数据源将其里面的数据导入到excel表单
+     *
+     * @return 结果
+     */
+    public String createExcel() {
+        OutputStream out = null;
+        try {
+            writeSheet();
+            //重新进行名称编码
+            String filename = extractNewFilename(sheetName);
+            //获取绝对路径
+            String absoluteFilePath = getAbsoluteFile(filename);
+            out = new FileOutputStream(absoluteFilePath);
+            wb.write(out);
+            return absoluteFilePath;
         } catch (Exception e) {
             log.error("导出Excel异常{}", e.getMessage());
             throw new UtilException("导出Excel失败，请联系网站管理员！");
@@ -1047,6 +1100,14 @@ public class ExcelUtil<T> {
             statistics.clear();
         }
     }
+
+    /**
+     * 重新编码文件名
+     */
+    public String extractNewFilename(String fileName) {
+        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(), fileName, Seq.getId(Seq.uploadSeqType), "xlsx");
+    }
+
 
     /**
      * 编码文件名
