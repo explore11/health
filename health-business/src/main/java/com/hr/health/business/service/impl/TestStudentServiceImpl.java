@@ -6,6 +6,7 @@ import cn.hutool.core.util.ZipUtil;
 import com.hr.health.business.domain.Student;
 import com.hr.health.business.mapper.TestStudentMapper;
 import com.hr.health.business.service.TestStudentService;
+import com.hr.health.common.config.HealthConfig;
 import com.hr.health.common.utils.CompressUtil;
 import com.hr.health.system.utils.poi.ExcelUtil;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -25,15 +29,32 @@ public class TestStudentServiceImpl implements TestStudentService {
 
     /**
      * 解析压缩包导入数据
+     *
      * @param file
      */
     @Override
-    public void parseCompressImportData(MultipartFile file) {
+    public void parseCompressImportData(MultipartFile file) throws IOException {
+        //组装路径
+        ExcelUtil excelUtil = new ExcelUtil();
+        String originalFilename = file.getOriginalFilename();
+        //获取文件名以及去除后缀
+        String fileName = originalFilename.substring(originalFilename.lastIndexOf("/") + 1).substring(0,originalFilename.lastIndexOf("."));
+        //解压缩路径
+        String unZipPath = HealthConfig.getUnCompressPath() + excelUtil.extractNewFilename(fileName, "zip");
+        //解析压缩包
+        File unzip = ZipUtil.unzip(file.getInputStream(), new File(unZipPath), StandardCharsets.UTF_8);
+        System.out.println(unzip);
+        //读取excel表中的数据
 
+        //保存数据
+
+        //删除数据
+        FileUtil.del(unzip);
     }
 
     /**
      * 下载压缩导入模板
+     *
      * @param response
      */
     @Override
@@ -47,7 +68,7 @@ public class TestStudentServiceImpl implements TestStudentService {
         String zipPath = path + "导入模板压缩包.zip";
 
         //进行文件压缩
-        File zipFile = ZipUtil.zip(excelPath,zipPath);
+        File zipFile = ZipUtil.zip(excelPath, zipPath);
         CompressUtil.downloadZip(response, zipFile.getName(), zipFile);
 
         //删除数据
@@ -98,7 +119,7 @@ public class TestStudentServiceImpl implements TestStudentService {
         String zipPath = path + "单个压缩包名称.zip";
 
         //进行文件压缩
-        File zipFile = ZipUtil.zip(excelPath,zipPath);
+        File zipFile = ZipUtil.zip(excelPath, zipPath);
         CompressUtil.downloadZip(response, zipFile.getName(), zipFile);
 
         //删除数据

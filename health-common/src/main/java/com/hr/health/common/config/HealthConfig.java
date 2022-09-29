@@ -129,4 +129,11 @@ public class HealthConfig {
     public static String getUploadPath() {
         return getProfile() + "/upload";
     }
+
+    /**
+     * 获取解压路径
+     */
+    public static String getUnCompressPath() {
+        return getProfile() + "/compress/";
+    }
 }

@@ -6,6 +6,7 @@ import com.hr.health.business.domain.Student;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 public interface TestStudentService {
@@ -50,5 +51,5 @@ public interface TestStudentService {
      * 解析压缩包导入数据
      * @param file
      */
-    void parseCompressImportData(MultipartFile file);
+    void parseCompressImportData(MultipartFile file) throws IOException;
 }

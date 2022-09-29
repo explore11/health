@@ -134,6 +134,9 @@ public class ExcelUtil<T> {
         this.clazz = clazz;
     }
 
+    public ExcelUtil() {
+    }
+
     /**
      * 获取画布
      */
@@ -671,7 +674,7 @@ public class ExcelUtil<T> {
         try {
             writeSheet();
             //重新进行名称编码
-            String filename = extractNewFilename(sheetName);
+            String filename = extractNewFilename(sheetName,"xlsx");
             //获取绝对路径
             String absoluteFilePath = getAbsoluteFile(filename);
             out = new FileOutputStream(absoluteFilePath);
@@ -1104,8 +1107,8 @@ public class ExcelUtil<T> {
     /**
      * 重新编码文件名
      */
-    public String extractNewFilename(String fileName) {
-        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(), fileName, Seq.getId(Seq.uploadSeqType), "xlsx");
+    public String extractNewFilename(String fileName,String suffix) {
+        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(), fileName, Seq.getId(Seq.uploadSeqType), suffix);
     }
 
 
