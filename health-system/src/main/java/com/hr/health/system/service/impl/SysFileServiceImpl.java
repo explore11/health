@@ -22,6 +22,7 @@ import com.hr.health.system.domain.SysFileInfo;
 import com.hr.health.system.mapper.SysFileMapper;
 import com.hr.health.system.service.SysFileService;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,8 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -55,7 +55,6 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileInfo> 
 
     @Value("${upload.fileNameLength}")
     private Integer fileNameLength;
-
 
 
     /**
@@ -85,8 +84,31 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileInfo> 
             e.printStackTrace();
             throw new MicroServiceException(ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.code(), ResultCode.SPECIFIED_FILE_DOWNLOAD_FAILURE.message());
         }
+
     }
 
+
+    public void downloadFile(String resource, HttpServletRequest request, HttpServletResponse response) {
+        InputStream is = null;
+        BufferedOutputStream outputStream = null;
+        try {
+            //设置编码
+            String fileName = "美团打车电子发票_20220928164519A001.pdf";
+            File file = new File("D:/health/uploadPath/upload/2022/09/28/美团打车电子发票_20220928164519A001.pdf");
+            //设置浏览器头
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setCharacterEncoding("UTF-8");
+            try (InputStream inputStream = new FileInputStream((file))) {
+                IOUtils.copy(inputStream, response.getOutputStream());
+            } catch (Exception e) {
+                log.error("文件下载异常", e.getMessage());
+                throw new MicroServiceException(ResultCode.SYSTEM_INNER_ERROR.code(), "下载文件错误");
+            }
+        } catch (Exception e) {
+            log.error("文件下载异常", e.getMessage());
+            throw new MicroServiceException(ResultCode.SYSTEM_INNER_ERROR.code(), "下载文件错误");
+        }
+    }
 
 
     /**

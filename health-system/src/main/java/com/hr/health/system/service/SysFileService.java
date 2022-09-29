@@ -65,4 +65,6 @@ public interface SysFileService extends IService<SysFileInfo> {
      * @param response
      */
     void resourceDownload(String resource, HttpServletRequest request, HttpServletResponse response);
+
+    void downloadFile(String resource, HttpServletRequest request, HttpServletResponse response);
 }

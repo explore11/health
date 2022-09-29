@@ -49,6 +49,7 @@ public class FileUtils {
                 os.write(b, 0, length);
             }
         } catch (IOException e) {
+            e.printStackTrace();
             throw e;
         } finally {
             IOUtils.close(os);
@@ -183,7 +184,7 @@ public class FileUtils {
                 .append(percentEncodedFileName);
 
         response.addHeader("Access-Control-Expose-Headers", "Content-Disposition,download-filename");
-        response.setHeader("Content-disposition", contentDispositionValue.toString());
+        response.setHeader("Content-Disposition", contentDispositionValue.toString());
         response.setHeader("download-filename", percentEncodedFileName);
     }
 
