@@ -104,6 +104,19 @@ spring:
   #  driver-class-name: com.p6spy.engine.spy.P6SpyDriver
   #  url: jdbc:p6spy:h2:mem:test
 
+  # freemarker模板配置
+  freemarker:
+    # 关闭缓存
+    cache: false
+    # 编码格式
+    charset: UTF-8
+    #开启视图解析器
+    enabled: true
+    # 后缀名
+    suffix: .ftl
+    # 模板路径
+    template-loader-path: classpath:/templates/
+
 # token配置
 token:
     # 令牌自定义标识
@@ -123,7 +136,6 @@ token:
 #    mapperLocations: classpath*:mapper/**/*Mapper.xml
 #    # 加载全局的配置文件
 #    configLocation: classpath:mybatis/mybatis-config.xml
-
 
 mybatis-plus:
   global-config:

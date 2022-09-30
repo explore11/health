@@ -24,6 +24,7 @@
 
     <properties>
         <health.version>1.0</health.version>
+        <freemarker.version>2.7.0</freemarker.version>
         <hutool.version>5.8.8</hutool.version>
         <zxing.version>3.3.3</zxing.version>
         <lombok.version>1.18.18</lombok.version>
@@ -54,6 +55,11 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
