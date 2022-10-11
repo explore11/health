@@ -2,7 +2,8 @@ package com.hr.health.framework.aspectj;
 
 import com.hr.health.common.annotation.RateLimiter;
 import com.hr.health.common.enums.LimitType;
-import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.utils.ServletUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.ip.IpUtils;
@@ -54,13 +55,11 @@ public class RateLimiterAspect {
         try {
             Long number = redisTemplate.execute(limitScript, keys, count, time);
             if (StringUtils.isNull(number) || number.intValue() > count) {
-                throw new ServiceException("访问过于频繁，请稍候再试");
+                throw new MicroServiceException(ResultCode.INTERFACE_ACCESS_MORE.code(), ResultCode.INTERFACE_ACCESS_MORE.message());
             }
             log.info("限制请求'{}',当前请求'{}',缓存key'{}'", count, number.intValue(), key);
-        } catch (ServiceException e) {
-            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("服务器限流异常，请稍候再试");
+            throw new MicroServiceException(ResultCode.INTERFACE_LIMIT_FLOW_FAILURE.code(), ResultCode.INTERFACE_LIMIT_FLOW_FAILURE.message());
         }
     }
 

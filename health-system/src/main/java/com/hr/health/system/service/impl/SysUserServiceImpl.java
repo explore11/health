@@ -11,7 +11,6 @@ import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
 import com.hr.health.common.enums.ResultCode;
 import com.hr.health.common.exception.MicroServiceException;
-import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.bean.BeanValidators;
@@ -723,8 +722,8 @@ public class SysUserServiceImpl implements ISysUserService {
             }
         }
         if (failureNum > 0) {
-            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
-            throw new ServiceException(failureMsg.toString());
+            failureMsg.insert(0, " 共 " + failureNum + " 条数据格式不正确，错误如下：");
+            throw new MicroServiceException(ResultCode.DATA_IMPORT_FAILURE.code(), ResultCode.DATA_IMPORT_FAILURE.message() + failureMsg);
         } else {
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }

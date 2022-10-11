@@ -4,7 +4,8 @@ import com.hr.health.common.constant.Constants;
 import com.hr.health.common.core.domain.entity.SysMenu;
 import com.hr.health.common.core.domain.entity.SysUser;
 import com.hr.health.common.core.domain.model.LoginUser;
-import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.exception.user.UserPasswordNotMatchException;
 import com.hr.health.common.utils.DateUtils;
 import com.hr.health.common.utils.MessageUtils;
@@ -76,7 +77,7 @@ public class SysLoginService {
                 throw new UserPasswordNotMatchException();
             } else {
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
-                throw new ServiceException(e.getMessage());
+                throw new MicroServiceException(ResultCode.USER_LOGIN_ERROR.code(), ResultCode.USER_LOGIN_ERROR.message());
             }
         } finally {
             AuthenticationContextHolder.clearContext();

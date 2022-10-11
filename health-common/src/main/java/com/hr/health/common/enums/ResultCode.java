@@ -39,12 +39,14 @@ public enum ResultCode {
     USER_EMAIL_EXIST(217, "用户邮箱已存在"),
     USER_NO_DELETE(218, "当前用户不能删除"),
     USER_NO_ALLOW_USE_SUPER_ADMIN(219, "不允许操作超级管理员角色"),
+    USER_INFO_FAILURE(220, "获取用户信息失败"),
 
     /* 业务错误：301-399 */
     SPECIFIED_UPLOAD_FILE_FAILURE(301, "文件上传失败"),
     SPECIFIED_FILE_DOWNLOAD_FAILURE(302, "文件下载失败"),
     SPECIFIED_FILE_ILLEGAL_NO_DOWNLOAD(303, "资源文件非法，不允许下载"),
     SPECIFIED_INNER_PARAM_NO_DELETE(304, "内置参数，不允许删除"),
+    SPECIFIED_ZIP_WRITE_ERROR(305, "压缩包写入数据错误"),
 
     /* 数据错误：401-499 */
     RESULT_DATA_NONE(401, "数据未找到"),
@@ -60,6 +62,9 @@ public enum ResultCode {
     DATA_POST_NUMBER_ALREADY_EXISTED(412, "岗位编码已存在"),
     DATA_POST_STOP_NO_ALLOW_ADD(413, "部门停用，不允许新增"),
     DATA_POST_ALREADY_DISTRIBUTION(414, "岗位已分配,不允许删除"),
+    DATA_POST_INFO_FAILURE(415, "获取岗位信息失败"),
+    DATA_ALREADY_DISTRIBUTION(416, "该数据已经分配，不能删除"),
+    DATA_IMPORT_FAILURE(417, "数据导入失败"),
 
     /* 系统错误：501-599 */
     SYSTEM_INNER_ERROR(501, "系统内部出错，请稍后重试"),
@@ -71,9 +76,12 @@ public enum ResultCode {
     INTERFACE_ADDRESS_INVALID(604, "接口地址无效"),
     INTERFACE_REQUEST_TIMEOUT(605, "接口请求超时"),
     INTERFACE_EXCEED_LOAD(606, "接口负载过高"),
+    INTERFACE_ACCESS_MORE(607, "访问过于频繁，请稍候再试"),
+    INTERFACE_LIMIT_FLOW_FAILURE(608, "服务器限流异常"),
 
     /* 权限错误：701-799 */
-    PERMISSION_NO_ACCESS(701, "无访问权限");
+    PERMISSION_NO_ACCESS(701, "无访问权限，请联系管理员添加权限"),
+    PERMISSION_DEMO_MODEL(702, "演示模式，不允许操作");
 
     private Integer code;
 

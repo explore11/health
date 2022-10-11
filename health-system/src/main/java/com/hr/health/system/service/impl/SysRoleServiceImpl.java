@@ -5,7 +5,6 @@ import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysRole;
 import com.hr.health.common.enums.ResultCode;
 import com.hr.health.common.exception.MicroServiceException;
-import com.hr.health.common.exception.ServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.common.utils.spring.SpringUtils;
@@ -358,7 +357,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
             checkRoleAllowed(new SysRole(roleId));
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
+                throw new MicroServiceException(ResultCode.DATA_ALREADY_DISTRIBUTION.code(), ResultCode.DATA_ALREADY_DISTRIBUTION.message());
             }
         }
         // 删除角色与菜单关联

@@ -74,7 +74,7 @@ public class Result<T> implements Serializable {
     }
 
     public static <T> Result<T> failure(String message) {
-        return new Result<>(302, message);
+        return new Result<>(ResultCode.SYSTEM_INNER_ERROR.code(), message);
     }
 
     public static <T> Result<T> check(boolean flag, ResultCode resultCode) {

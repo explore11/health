@@ -3,7 +3,8 @@ package com.hr.health.system.service.impl;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.entity.SysDictData;
 import com.hr.health.common.core.domain.entity.SysDictType;
-import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import com.hr.health.common.utils.SecurityUtils;
 import com.hr.health.common.utils.StringUtils;
 import com.hr.health.system.mapper.SysDictDataMapper;
@@ -97,7 +98,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
         for (Long dictId : dictIds) {
             SysDictType dictType = selectDictTypeById(dictId);
             if (dictDataMapper.countDictDataByType(dictType.getDictType()) > 0) {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
+                throw new MicroServiceException(ResultCode.DATA_ALREADY_DISTRIBUTION.code(), ResultCode.DATA_ALREADY_DISTRIBUTION.message());
             }
             dictTypeMapper.deleteDictTypeById(dictId);
         }
