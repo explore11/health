@@ -1,7 +1,10 @@
 package com.hr.health.system.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 public interface WordService {
     /**
@@ -12,4 +15,11 @@ public interface WordService {
      */
     void downloadWord(HttpServletRequest request, HttpServletResponse response);
 
+    /**
+     * docx文档下载更改
+     *
+     * @param map
+     * @param response
+     */
+    void downloadWordByDocx(Map<String, MultipartFile> map, HttpServletResponse response);
 }

@@ -48,12 +48,13 @@ public class WordServiceImpl implements WordService {
         Word word = this.getWord(outFileName);
 
         Map<String, File> fileMap = new HashMap<>();
+        // 图片名称为中文好像读不出，暂时未找到原因
+        fileMap.put("0", new File("D:\\pic\\aaaa.jpeg"));
+        fileMap.put("1", new File("D:\\pic\\bbbb.jpeg"));
+        fileMap.put("2", new File("D:\\pic\\cccc.jpeg"));
 
-//        fileMap.put("0", new File("D:\\pic\\aaaa.jpeg"));
-//        fileMap.put("1", new File("D:\\pic\\bbbb.jpeg"));
-
-        fileMap.put("0", new File("D:\\pic\\哈哈.jpeg"));
-        fileMap.put("1", new File("D:\\pic\\嘻嘻.jpeg"));
+//        fileMap.put("0", new File("D:\\pic\\哈哈.jpeg"));
+//        fileMap.put("1", new File("D:\\pic\\嘻嘻.jpeg"));
         //TODO 设置用户数据 暂时是假数据
         word.setData(DataUtils.getData(fileMap));
 
@@ -109,7 +110,7 @@ public class WordServiceImpl implements WordService {
                         }
                         picis.close();
                         zos.closeEntry();
-                        //创建图片与内容的关系配置
+                        //创建图片与内容的关系配置 图片的源定义
                         picRels.append("<Relationship Id=\"").append(picture.getPictureName()).append("\" ").append("Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/image\" ").append("Target=\"media/").append(picture.getFileName()).append("\"/>\n");
                     }
                 }

@@ -1,11 +1,11 @@
 package com.hr.health.common.utils;
 
-import com.hr.health.common.exception.ServiceException;
+import com.hr.health.common.core.domain.model.LoginUser;
+import com.hr.health.common.enums.ResultCode;
+import com.hr.health.common.exception.MicroServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.hr.health.common.constant.HttpStatus;
-import com.hr.health.common.core.domain.model.LoginUser;
 
 /**
  * 安全服务工具类
@@ -20,7 +20,7 @@ public class SecurityUtils {
         try {
             return getLoginUser().getUserId();
         } catch (Exception e) {
-            throw new ServiceException("获取用户ID异常", HttpStatus.UNAUTHORIZED);
+            throw new MicroServiceException(ResultCode.USER_INFO_FAILURE.code(),ResultCode.USER_INFO_FAILURE.message());
         }
     }
 
@@ -31,7 +31,7 @@ public class SecurityUtils {
         try {
             return getLoginUser().getDeptId();
         } catch (Exception e) {
-            throw new ServiceException("获取部门ID异常", HttpStatus.UNAUTHORIZED);
+            throw new MicroServiceException(ResultCode.DATA_POST_INFO_FAILURE.code(),ResultCode.DATA_POST_INFO_FAILURE.message());
         }
     }
 
@@ -42,7 +42,7 @@ public class SecurityUtils {
         try {
             return getLoginUser().getUsername();
         } catch (Exception e) {
-            throw new ServiceException("获取用户账户异常", HttpStatus.UNAUTHORIZED);
+            throw new MicroServiceException(ResultCode.USER_INFO_FAILURE.code(),ResultCode.USER_INFO_FAILURE.message());
         }
     }
 
@@ -53,7 +53,7 @@ public class SecurityUtils {
         try {
             return (LoginUser) getAuthentication().getPrincipal();
         } catch (Exception e) {
-            throw new ServiceException("获取用户信息异常", HttpStatus.UNAUTHORIZED);
+            throw new MicroServiceException(ResultCode.USER_INFO_FAILURE.code(),ResultCode.USER_INFO_FAILURE.message());
         }
     }
 
