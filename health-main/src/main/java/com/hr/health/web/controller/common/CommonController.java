@@ -3,11 +3,7 @@ package com.hr.health.web.controller.common;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.system.service.CommonService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/common/resource")
 public class CommonController {
-    private static final Logger log = LoggerFactory.getLogger(CommonController.class);
     @Resource
     private CommonService commonService;
 
