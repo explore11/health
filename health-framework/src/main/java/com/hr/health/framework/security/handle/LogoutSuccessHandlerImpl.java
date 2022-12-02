@@ -47,8 +47,6 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
             String loginUserStr = (String) claims.get(Constants.LOGIN_USER_KEY);
             LoginUser loginUser = JSON.parseObject(loginUserStr, LoginUser.class);
             if (StringUtils.isNotNull(loginUser)) {
-                //TODO 删除header中的token  前端删除 或者后端删除
-
                 // 记录用户退出日志
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(loginUser.getUsername(), Constants.LOGOUT, "退出成功"));
             }

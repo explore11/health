@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.hr.health.common.config.HealthConfig;
+import com.hr.health.common.constant.GlobalConstants;
 import com.hr.health.common.constant.UserConstants;
 import com.hr.health.common.core.domain.Result;
 import com.hr.health.common.core.domain.entity.SysRole;
@@ -25,6 +26,7 @@ import com.hr.health.system.service.ISysPostService;
 import com.hr.health.system.service.ISysRoleService;
 import com.hr.health.system.service.ISysUserService;
 import com.hr.health.system.utils.poi.ExcelUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,7 @@ import java.util.stream.Collectors;
  * @author swq
  */
 @Service
+@Slf4j
 public class SysUserServiceImpl implements ISysUserService {
     private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
 
@@ -80,25 +83,25 @@ public class SysUserServiceImpl implements ISysUserService {
 
 
     /**
-     * 生成压缩包
+     * 根据路径生成压缩包
      *
      * @return
      */
     @Override
-    public Result generateCompressedPackage() {
-        File zip = ZipUtil.zip("D:\\place");
-        System.out.println(zip.getPath());
+    public Result generateCompressedPackage(String path) {
+        File zip = ZipUtil.zip(path);
+        log.info(zip.getPath());
         return Result.success(zip.getPath());
     }
 
     /**
-     * 解析二维码
+     * 据路径解析二维码
      *
      * @return
      */
     @Override
-    public Result parseQrCode() {
-        String decode = QrCodeUtil.decode(FileUtil.file("d:/qrcode.jpg"));
+    public Result parseQrCode(String path) {
+        String decode = QrCodeUtil.decode(FileUtil.file(path));
         return Result.success(decode);
     }
 
@@ -110,7 +113,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public Result generateQrCode(SysUser user) {
-        QrCodeUtil.generate("111", 300, 300, FileUtil.file("d:/qrcode1.jpg"));
+        QrCodeUtil.generate(user.getUserName(), GlobalConstants.CODE_WIDTH, GlobalConstants.CODE_HEIGHT, FileUtil.file(GlobalConstants.CODE_TEST_PATH));
         return Result.success();
     }
 
@@ -199,8 +202,6 @@ public class SysUserServiceImpl implements ISysUserService {
                 return Result.success(avatar);
             }
         }
-
-
         return Result.failure();
     }
 

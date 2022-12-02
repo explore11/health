@@ -44,23 +44,23 @@ public class SysUserController extends BaseController {
 
 
     /**
-     * 生成压缩包
+     * 根据路径生成压缩包
      */
-    @ApiOperation("生成压缩包")
+    @ApiOperation("根据路径生成压缩包")
     @PreAuthorize("@ss.hasPermi('system:user:generateCompressedPackage')")
     @GetMapping("/generateCompressedPackage")
-    public Result generateCompressedPackage() {
-        return userService.generateCompressedPackage();
+    public Result generateCompressedPackage(String path) {
+        return userService.generateCompressedPackage(path);
     }
 
     /**
-     * 解析二维码
+     * 据路径解析二维码
      */
-    @ApiOperation("解析二维码")
+    @ApiOperation("据路径解析二维码")
     @PreAuthorize("@ss.hasPermi('system:user:parseQrCode')")
     @GetMapping("/parseQrCode")
-    public Result parseQrCode() {
-        return userService.parseQrCode();
+    public Result parseQrCode(String path) {
+        return userService.parseQrCode(path);
     }
 
     /**

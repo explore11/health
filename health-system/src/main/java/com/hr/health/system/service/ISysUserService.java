@@ -309,15 +309,15 @@ public interface ISysUserService {
     Result generateQrCode(SysUser user);
 
     /**
-     * 解析二维码
+     * 据路径解析二维码
      * @return
      */
-    Result parseQrCode();
+    Result parseQrCode(String path);
 
 
     /**
-     * 生成压缩包
+     * 根据路径生成压缩包
      * @return
      */
-    Result generateCompressedPackage();
+    Result generateCompressedPackage(String path);
 }

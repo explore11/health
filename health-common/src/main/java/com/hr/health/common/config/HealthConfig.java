@@ -46,6 +46,41 @@ public class HealthConfig {
      */
     private static String captchaType;
 
+    /**
+     * 获取导入上传路径
+     */
+    public static String getImportPath() {
+        return getProfile() + "/import";
+    }
+
+    /**
+     * 获取头像上传路径
+     */
+    public static String getAvatarPath() {
+        return getProfile() + "/avatar";
+    }
+
+    /**
+     * 获取下载路径
+     */
+    public static String getDownloadPath() {
+        return getProfile() + "/download/";
+    }
+
+    /**
+     * 获取上传路径
+     */
+    public static String getUploadPath() {
+        return getProfile() + "/upload";
+    }
+
+    /**
+     * 获取解压路径
+     */
+    public static String getUnCompressPath() {
+        return getProfile() + "/compress/";
+    }
+
     public String getName() {
         return name;
     }
@@ -102,38 +137,5 @@ public class HealthConfig {
         HealthConfig.captchaType = captchaType;
     }
 
-    /**
-     * 获取导入上传路径
-     */
-    public static String getImportPath() {
-        return getProfile() + "/import";
-    }
 
-    /**
-     * 获取头像上传路径
-     */
-    public static String getAvatarPath() {
-        return getProfile() + "/avatar";
-    }
-
-    /**
-     * 获取下载路径
-     */
-    public static String getDownloadPath() {
-        return getProfile() + "/download/";
-    }
-
-    /**
-     * 获取上传路径
-     */
-    public static String getUploadPath() {
-        return getProfile() + "/upload";
-    }
-
-    /**
-     * 获取解压路径
-     */
-    public static String getUnCompressPath() {
-        return getProfile() + "/compress/";
-    }
 }
